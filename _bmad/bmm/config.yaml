@@ -1,0 +1,21 @@
+module: bmm
+
+# ── Project ────────────────────────────────────────────────────────────────────
+project_name: Trace
+communication_language: English
+document_output_language: English
+
+# ── Designer ───────────────────────────────────────────────────────────────────
+# Set automatically by /bmad-generate-project-context on first run.
+user_name: ""
+user_role: product designer
+
+# ── User experience level (beginner / intermediate / expert) ───────────────────
+# Affects how agents explain things. Product designers → intermediate.
+developer_skill_level: intermediate
+
+# ── Artifact paths (relative to project root) ──────────────────────────────────
+output_folder: _bmad
+planning_artifacts: _bmad/planning-artifacts
+implementation_artifacts: _bmad/implementation-artifacts
+project_knowledge: _bmad/docs
