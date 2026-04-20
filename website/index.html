@@ -1,0 +1,942 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Trace — Your team's AI work, wherever you pick it up.</title>
+  <meta name="description" content="Trace captures what your team does across Claude, ChatGPT, and Cursor — and lands it on the machine you're working on now." />
+
+  <style>
+    :root {
+      --bg: #f6f5f1;
+      --ink: #0f1115;
+      --ink-2: #2a2d33;
+      --muted: #7a7d85;
+      --hair: #e6e3db;
+      --accent: #d98a2b;
+      --accent-soft: #f2c892;
+      --claude: #c96442;
+      --gpt: #10a37f;
+      --cursor-ink: #111;
+      --code: #1e1e2e;
+
+      --wall-1: linear-gradient(135deg, #f6d8a8 0%, #e8a87c 55%, #c38d6a 100%);
+      --wall-2: linear-gradient(135deg, #2a2f57 0%, #4a4a8a 55%, #6d5f9e 100%);
+
+      --shadow-md: 0 10px 30px rgba(15,17,21,0.08);
+      --shadow-lg: 0 30px 80px rgba(15,17,21,0.18), 0 6px 20px rgba(15,17,21,0.08);
+
+      --font: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+      --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+
+      --stage-w: min(1120px, 92vw);
+      --stage-h: min(640px, 60vh);
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; min-height: 100%; }
+    body {
+      font-family: var(--font); color: var(--ink);
+      background-color: var(--bg);
+      background-image:
+        radial-gradient(circle at center, rgba(15,17,21,0.07) 1px, transparent 1.2px);
+      background-size: 22px 22px;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ---------- Page chrome ---------- */
+    .wordmark {
+      position: fixed; top: 22px; left: 28px; z-index: 100;
+      font-size: 18px; font-weight: 600; letter-spacing: -0.01em;
+      color: var(--ink); text-decoration: none;
+    }
+    .wordmark::after {
+      content: "";
+      display: inline-block; width: 5px; height: 5px; border-radius: 50%;
+      background: var(--accent); margin-left: 6px; transform: translateY(-2px);
+    }
+
+    .skip-pill, .replay-pill {
+      position: absolute; z-index: 30;
+      top: -44px; right: 0;
+      padding: 7px 13px; border-radius: 999px;
+      font-size: 12px; letter-spacing: 0.01em; color: var(--ink-2);
+      background: rgba(255,255,255,0.9); backdrop-filter: blur(12px);
+      border: 1px solid var(--hair);
+      cursor: pointer; opacity: 0; pointer-events: none;
+      transition: opacity 280ms ease;
+      font-family: var(--font);
+    }
+    .skip-pill.visible, .replay-pill.visible { opacity: 1; pointer-events: auto; }
+    .skip-pill:hover, .replay-pill:hover { background: white; }
+
+    /* ---------- Hero layout ---------- */
+    .hero {
+      min-height: 100vh;
+      padding: 96px 24px 64px;
+      display: flex; flex-direction: column; align-items: center;
+      gap: 40px;
+    }
+    .hero-copy {
+      text-align: center; max-width: 780px;
+      display: flex; flex-direction: column; align-items: center; gap: 16px;
+    }
+    .hero-copy h1 {
+      font-size: clamp(36px, 5vw, 60px);
+      line-height: 1.02; letter-spacing: -0.025em;
+      font-weight: 600;
+      margin: 0;
+      max-width: 18ch;
+    }
+    .hero-copy p {
+      font-size: clamp(15px, 1.2vw, 18px);
+      color: var(--ink-2); line-height: 1.5;
+      margin: 0; max-width: 54ch;
+    }
+
+    /* ---------- Stage wrapper (holds stage + skip/replay + cta below) ---------- */
+    .stage-wrap {
+      position: relative;
+      width: var(--stage-w);
+      display: flex; flex-direction: column; align-items: center;
+    }
+
+    /* ---------- The stage card (macOS window) ---------- */
+    .stage {
+      position: relative;
+      width: 100%;
+      height: var(--stage-h);
+      background: var(--bg);
+      border-radius: 14px;
+      box-shadow: var(--shadow-lg);
+      overflow: hidden;
+      border: 1px solid rgba(15,17,21,0.06);
+      isolation: isolate;
+    }
+
+    /* Outer window chrome (browser-ish title bar above the menubar) */
+    .stage-chrome {
+      position: absolute; top: 0; left: 0; right: 0; height: 32px;
+      background: #edeae1;
+      border-bottom: 1px solid rgba(15,17,21,0.08);
+      display: flex; align-items: center; padding: 0 14px;
+      z-index: 60;
+    }
+    .stage-chrome .traffic { display: flex; gap: 7px; }
+    .stage-chrome .traffic span {
+      width: 12px; height: 12px; border-radius: 50%;
+      background: #d3cfc3;
+    }
+    .stage-chrome .title {
+      position: absolute; left: 50%; transform: translateX(-50%);
+      font-size: 12px; color: var(--ink-2); font-weight: 500;
+    }
+
+    /* Desktop area (below the chrome) */
+    .desktop {
+      position: absolute; left: 0; right: 0; top: 32px; bottom: 0;
+      overflow: hidden;
+      background: var(--bg);
+    }
+
+    /* Menubar (inside the desktop area, top) */
+    .menubar {
+      position: absolute; top: 0; left: 0; right: 0; height: 26px;
+      background: rgba(255,255,255,0.55);
+      backdrop-filter: blur(18px);
+      border-bottom: 1px solid rgba(15,17,21,0.06);
+      display: flex; align-items: center; justify-content: flex-end;
+      padding: 0 12px 0 14px; gap: 14px;
+      font-size: 11px; color: var(--ink-2);
+      opacity: 0; transition: opacity 500ms ease;
+      z-index: 50;
+    }
+    .menubar.visible { opacity: 1; }
+    .menubar .clock { font-variant-numeric: tabular-nums; letter-spacing: 0.02em; }
+    .menubar .avatar {
+      width: 17px; height: 17px; border-radius: 50%;
+      background: linear-gradient(135deg, #ffd27a, #e8a87c);
+      color: var(--ink); font-size: 10px; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; transition: opacity 400ms ease;
+    }
+    .menubar .avatar.visible { opacity: 1; }
+
+    /* Wallpaper + sliding content container */
+    .desk-layer {
+      position: absolute; inset: 26px 0 0 0;
+      transition: transform 700ms cubic-bezier(.7,0,.2,1), opacity 500ms ease;
+      will-change: transform, opacity;
+    }
+    .wallpaper {
+      position: absolute; inset: 0;
+      background: var(--wall-1);
+      opacity: 0;
+      transition: opacity 700ms ease;
+    }
+    .wallpaper.visible { opacity: 1; }
+    .wallpaper.desk-2 { background: var(--wall-2); }
+
+    /* When switching desks, we slide the app content (not the icon) */
+    .apps-layer {
+      position: absolute; inset: 0;
+      transition: transform 700ms cubic-bezier(.7,0,.2,1), opacity 500ms ease;
+      will-change: transform, opacity;
+    }
+    .apps-layer.slide-out-left { transform: translateX(-12%); opacity: 0; }
+    .apps-layer.slide-in-right { transform: translateX(0); opacity: 1; }
+    .apps-layer.prep-right { transform: translateX(12%); opacity: 0; transition: none; }
+
+    /* ---------- Trace icon ---------- */
+    .icon {
+      position: absolute;
+      z-index: 80;
+      width: 160px; height: 160px;
+      left: 50%; top: 50%;
+      transform: translate(-50%, -50%) scale(0.6);
+      opacity: 0;
+      filter: drop-shadow(0 16px 40px rgba(15,17,21,0.28));
+      transition:
+        transform 900ms cubic-bezier(.22,.9,.28,1.2),
+        opacity 700ms ease,
+        width 900ms cubic-bezier(.4,0,.2,1),
+        height 900ms cubic-bezier(.4,0,.2,1),
+        left 900ms cubic-bezier(.4,0,.2,1),
+        top 900ms cubic-bezier(.4,0,.2,1),
+        filter 900ms ease;
+    }
+    .icon.drop-in { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+    /* docked inside the stage menubar, top-right of stage */
+    .icon.docked {
+      width: 30px; height: 30px;
+      left: calc(100% - 28px);
+      top: 16px;
+      transform: translate(-50%, -50%) scale(1);
+      filter: drop-shadow(0 2px 6px rgba(15,17,21,0.25));
+    }
+    .icon .icon-bg { fill: #0f1115; }
+    .icon .icon-path { stroke: #f6d89a; stroke-width: 6; fill: none; stroke-linecap: round; }
+    .icon .icon-dots circle { fill: var(--accent-soft); }
+    .icon .icon-dot-live { fill: var(--accent); }
+
+    /* Subtle breathing glow on the live dot */
+    .icon.blink .icon-dot-live {
+      animation: blink 2.4s ease-in-out infinite;
+      transform-origin: 78px 30px;
+    }
+    @keyframes blink {
+      0%, 100% { opacity: 1; filter: none; }
+      50% { opacity: 0.45; }
+    }
+
+    /* Pulse when capture arrives */
+    .icon.pulse .icon-bg { animation: iconPulse 700ms ease-out; }
+    @keyframes iconPulse {
+      0% { fill: #0f1115; }
+      30% { fill: var(--accent); }
+      100% { fill: #0f1115; }
+    }
+    .icon.pulse .icon-dot-live {
+      animation: dotFlare 700ms ease-out;
+    }
+    @keyframes dotFlare {
+      0% { r: 6; }
+      30% { r: 10; }
+      100% { r: 6; }
+    }
+
+    .icon-badge {
+      position: absolute;
+      top: -5px; right: -5px;
+      min-width: 17px; height: 17px;
+      padding: 0 5px;
+      border-radius: 999px;
+      background: var(--accent);
+      color: white;
+      font-size: 10.5px; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      transform: scale(0); opacity: 0;
+      transition: transform 260ms cubic-bezier(.3,1.4,.5,1), opacity 200ms ease;
+      box-shadow: 0 0 0 2px var(--bg), 0 2px 6px rgba(217,138,43,0.5);
+      z-index: 90;
+    }
+    .icon-badge.visible { transform: scale(1); opacity: 1; }
+    .icon-badge.bump { animation: bump 380ms cubic-bezier(.3,1.4,.5,1); }
+    @keyframes bump {
+      0% { transform: scale(1); }
+      40% { transform: scale(1.45); }
+      100% { transform: scale(1); }
+    }
+
+    /* ---------- Windows (Claude / ChatGPT / Code) ---------- */
+    .window {
+      position: absolute;
+      background: rgba(255,255,255,0.97);
+      border-radius: 10px;
+      box-shadow: 0 18px 46px rgba(15,17,21,0.22), 0 2px 6px rgba(15,17,21,0.08);
+      overflow: hidden;
+      opacity: 0;
+      transform: scale(0.96) translateY(8px);
+      transition: opacity 500ms ease, transform 500ms cubic-bezier(.22,.9,.28,1.15);
+      z-index: 30;
+    }
+    .window.visible { opacity: 1; transform: scale(1) translateY(0); }
+    .window .titlebar {
+      height: 30px;
+      display: flex; align-items: center; gap: 9px;
+      padding: 0 12px;
+      border-bottom: 1px solid rgba(15,17,21,0.06);
+      font-size: 11.5px; color: var(--ink-2); font-weight: 500;
+    }
+    .window .traffic { display: flex; gap: 5px; }
+    .window .traffic span { width: 10px; height: 10px; border-radius: 50%; background: #e6e3db; }
+
+    /* Claude */
+    .win-claude { width: 420px; height: 230px; left: 10%; top: 26%; }
+    .win-claude .brand-dot { width: 13px; height: 13px; border-radius: 4px; background: var(--claude); }
+    .win-claude .chat-area {
+      padding: 20px 18px 14px; height: calc(100% - 30px);
+      display: flex; flex-direction: column; justify-content: flex-end;
+    }
+    .win-claude .input {
+      border: 1px solid var(--hair); border-radius: 10px;
+      padding: 14px 46px 14px 14px;
+      font-size: 13px; color: var(--ink);
+      background: #fafaf8;
+      min-height: 50px;
+      display: flex; align-items: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .typed { white-space: pre; }
+    .caret {
+      display: inline-block; width: 1.5px; height: 14px;
+      background: var(--ink); margin-left: 1px; vertical-align: -2px;
+      animation: caret 800ms steps(2) infinite;
+    }
+    @keyframes caret { 0%, 50% { opacity: 1; } 50.01%, 100% { opacity: 0; } }
+    .send-btn {
+      position: absolute; right: 8px; bottom: 8px;
+      width: 28px; height: 28px; border-radius: 8px;
+      background: var(--claude); color: white;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; transition: transform 150ms ease, box-shadow 150ms ease;
+    }
+    .send-btn.press { transform: scale(0.9); box-shadow: 0 0 0 6px rgba(201,100,66,0.2); }
+
+    /* ChatGPT (on desktop 2) */
+    .win-gpt { width: 440px; height: 270px; left: 8%; top: 20%; }
+    .win-gpt .brand-dot { width: 13px; height: 13px; border-radius: 50%; background: var(--gpt); }
+    .win-gpt .chat-area {
+      padding: 18px; height: calc(100% - 30px);
+      display: flex; flex-direction: column; gap: 9px;
+      font-size: 12.5px; color: var(--ink-2);
+    }
+    .win-gpt .bubble-user {
+      align-self: flex-end; max-width: 72%;
+      background: #ececec; padding: 9px 13px; border-radius: 16px 16px 4px 16px;
+    }
+    .win-gpt .bubble-ai {
+      align-self: flex-start; max-width: 80%;
+      background: #effaf5; color: var(--ink); padding: 9px 13px; border-radius: 16px 16px 16px 4px;
+      border: 1px solid rgba(16,163,127,0.18);
+    }
+
+    /* VS Code (pull reveal) */
+    .win-code {
+      width: 460px; height: 180px;
+      left: 50%; top: 58%;
+      transform: translate(-50%, 20px) scale(0.96);
+      background: var(--code);
+      color: #e5e5f0;
+    }
+    .win-code.visible { transform: translate(-50%, 0) scale(1); }
+    .win-code .titlebar { background: #2a2a3e; border-color: #00000033; color: #c5c5d5; }
+    .win-code .titlebar .traffic span { background: #4a4a5e; }
+    .win-code .branch {
+      padding: 12px 16px 6px; font-family: var(--mono); font-size: 11.5px; color: #a0a0c0;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .win-code .branch .badge {
+      background: rgba(217,138,43,0.22); color: var(--accent-soft);
+      padding: 2px 7px; border-radius: 5px; font-size: 10px; letter-spacing: 0.03em;
+    }
+    .win-code pre {
+      margin: 0; padding: 8px 16px 16px; font-family: var(--mono); font-size: 11.5px;
+      color: #c8c8e0; line-height: 1.55;
+    }
+    .win-code .kw { color: #b48cff; }
+    .win-code .str { color: #f2c892; }
+    .win-code .fn { color: #87d3ff; }
+    .win-code .cm { color: #70708a; }
+
+    /* ---------- Capture trace line ---------- */
+    .capture-line {
+      position: absolute; inset: 0; z-index: 70; pointer-events: none;
+      opacity: 0; transition: opacity 200ms ease;
+    }
+    .capture-line.visible { opacity: 1; }
+    .capture-line path {
+      fill: none; stroke: var(--accent); stroke-width: 2.5;
+      stroke-linecap: round;
+      filter: drop-shadow(0 0 8px rgba(217,138,43,0.75));
+    }
+
+    /* "New capture" ripple on the icon area when it lands */
+    .capture-land {
+      position: absolute; z-index: 75;
+      width: 10px; height: 10px; border-radius: 50%;
+      pointer-events: none;
+      background: transparent;
+      border: 2px solid var(--accent);
+      opacity: 0;
+    }
+    .capture-land.visible { animation: ripple 700ms ease-out forwards; }
+    @keyframes ripple {
+      0% { opacity: 1; transform: scale(0.6); }
+      100% { opacity: 0; transform: scale(6); }
+    }
+
+    /* ---------- Quick-look panel ---------- */
+    .quicklook {
+      position: absolute;
+      top: 38px; right: 10px;
+      width: 320px;
+      background: rgba(255,255,255,0.98);
+      border: 1px solid rgba(15,17,21,0.08);
+      border-radius: 12px;
+      box-shadow: 0 24px 60px rgba(15,17,21,0.28);
+      padding: 12px;
+      opacity: 0;
+      transform-origin: top right;
+      transform: translateY(-8px) scale(0.96);
+      transition: opacity 320ms ease, transform 360ms cubic-bezier(.22,.9,.28,1.12);
+      z-index: 85;
+    }
+    .quicklook.visible { opacity: 1; transform: translateY(0) scale(1); }
+    .ql-label {
+      font-size: 10px; text-transform: uppercase; letter-spacing: 0.09em;
+      color: var(--muted); font-weight: 600;
+      padding: 4px 6px;
+    }
+    .ql-row {
+      display: flex; align-items: center; gap: 10px;
+      padding: 8px 6px; border-radius: 7px;
+      opacity: 0; transform: translateY(4px);
+      transition: opacity 360ms ease, transform 360ms ease, background 160ms ease;
+    }
+    .ql-row.visible { opacity: 1; transform: translateY(0); }
+    .ql-row.hot { background: rgba(217,138,43,0.10); }
+    .ql-row .src {
+      width: 18px; height: 18px; border-radius: 5px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 9px; color: white; font-weight: 700;
+    }
+    .src.claude { background: var(--claude); }
+    .src.gpt { background: var(--gpt); }
+    .src.cursor { background: var(--cursor-ink); }
+    .ql-row .body { flex: 1; min-width: 0; }
+    .ql-row .title { font-size: 12px; color: var(--ink); font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .ql-row .meta { font-size: 10px; color: var(--muted); margin-top: 2px; }
+    .ql-row .pull-btn {
+      font-size: 10.5px; color: var(--accent);
+      padding: 3px 9px; border-radius: 6px;
+      border: 1px solid transparent;
+      background: transparent;
+      opacity: 0; transition: opacity 150ms ease, border-color 150ms ease;
+      font-family: var(--font);
+    }
+    .ql-row.hot .pull-btn { opacity: 1; border-color: rgba(217,138,43,0.4); }
+    .ql-row .check { color: #2b8a3e; font-size: 13px; opacity: 0; transition: opacity 200ms ease; }
+    .ql-row.pulled .check { opacity: 1; }
+    .ql-row.pulled .pull-btn { opacity: 0; }
+    .ql-divider { height: 1px; background: var(--hair); margin: 4px 4px; }
+
+    /* ---------- Stylized cursor ---------- */
+    .cursor {
+      position: absolute; z-index: 92; pointer-events: none;
+      width: 16px; height: 16px; opacity: 0;
+      transition: opacity 200ms ease,
+                  left 700ms cubic-bezier(.4,0,.2,1),
+                  top 700ms cubic-bezier(.4,0,.2,1);
+    }
+    .cursor.visible { opacity: 1; }
+    .cursor svg { width: 100%; height: 100%; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.35)); }
+
+    /* ---------- CTAs below the stage ---------- */
+    .cta-row {
+      display: flex; gap: 12px; align-items: center; flex-wrap: wrap;
+      justify-content: center;
+    }
+    .cta {
+      padding: 11px 20px; border-radius: 10px;
+      font-size: 14px; font-weight: 500; letter-spacing: -0.005em;
+      border: 1px solid transparent;
+      cursor: pointer;
+      font-family: var(--font);
+      transition: transform 120ms ease, box-shadow 140ms ease;
+    }
+    .cta:hover { transform: translateY(-1px); }
+    .cta-primary {
+      background: var(--ink); color: white;
+      box-shadow: 0 2px 0 rgba(0,0,0,0.1), 0 8px 20px rgba(15,17,21,0.18);
+    }
+    .cta-secondary { background: transparent; color: var(--ink); border-color: rgba(15,17,21,0.16); }
+    .cta-secondary:hover { background: rgba(15,17,21,0.04); }
+
+    /* ---------- Context-switch banner (brief overlay inside stage) ---------- */
+    .switch-banner {
+      position: absolute;
+      left: 50%; top: 50%;
+      transform: translate(-50%, -50%) scale(0.96);
+      background: rgba(15,17,21,0.9);
+      color: white;
+      padding: 8px 16px;
+      border-radius: 999px;
+      font-size: 12px; letter-spacing: 0.01em;
+      display: flex; align-items: center; gap: 8px;
+      opacity: 0; pointer-events: none;
+      z-index: 88;
+      backdrop-filter: blur(10px);
+      transition: opacity 280ms ease, transform 320ms cubic-bezier(.22,.9,.28,1.15);
+    }
+    .switch-banner.visible { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+    .switch-banner .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+
+    /* ---------- Reduced motion ---------- */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+    /* ---------- Mobile ---------- */
+    @media (max-width: 720px) {
+      :root { --stage-h: 460px; }
+      .win-claude { width: 85%; left: 7.5%; }
+      .win-gpt { width: 85%; left: 7.5%; }
+      .win-code { width: 90%; }
+      .quicklook { width: 78%; right: 6%; }
+    }
+  </style>
+</head>
+<body>
+  <a class="wordmark" href="/">Trace</a>
+
+  <main class="hero">
+    <div class="hero-copy">
+      <h1>Your team's AI work, wherever you pick it up.</h1>
+      <p>Trace captures what your team does across Claude, ChatGPT, and Cursor — and lands it on the machine you're working on now.</p>
+    </div>
+
+    <div class="stage-wrap">
+      <button class="skip-pill" id="skipPill" aria-label="Skip intro">Skip intro</button>
+      <button class="replay-pill" id="replayPill" aria-label="Replay intro">↻ Replay</button>
+
+      <div class="stage" id="stage">
+        <!-- Outer window chrome -->
+        <div class="stage-chrome">
+          <div class="traffic"><span></span><span></span><span></span></div>
+          <div class="title">Trace</div>
+        </div>
+
+        <!-- Desktop area -->
+        <div class="desktop">
+          <div class="wallpaper" id="wallpaper"></div>
+
+          <!-- Apps layer slides on context switch -->
+          <div class="apps-layer" id="appsLayer">
+            <div class="window win-claude" id="winClaude">
+              <div class="titlebar">
+                <div class="traffic"><span></span><span></span><span></span></div>
+                <div class="brand-dot"></div>
+                <div>Claude</div>
+              </div>
+              <div class="chat-area">
+                <div class="input">
+                  <span class="typed" id="typedClaude"></span><span class="caret"></span>
+                  <div class="send-btn" id="sendBtn">↵</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="window win-gpt" id="winGpt">
+              <div class="titlebar">
+                <div class="traffic"><span></span><span></span><span></span></div>
+                <div class="brand-dot"></div>
+                <div>ChatGPT</div>
+              </div>
+              <div class="chat-area">
+                <div class="bubble-user">what's the status on the pricing page refresh?</div>
+                <div class="bubble-ai">You have 2 updates waiting in Trace from Alex — draft copy and the new tier table.</div>
+              </div>
+            </div>
+
+            <div class="window win-code" id="winCode">
+              <div class="titlebar">
+                <div class="traffic"><span></span><span></span><span></span></div>
+                <div style="color:#c5c5d5">pricing-refresh.tsx — VS Code</div>
+              </div>
+              <div class="branch">
+                <span class="badge">branch</span>
+                <span>pricing/tier-table-v2</span>
+                <span style="color:#70708a"> • pulled from Trace</span>
+              </div>
+<pre><span class="cm">// Draft from Alex, captured via Claude</span>
+<span class="kw">export</span> <span class="kw">const</span> <span class="fn">tiers</span> = [
+  { name: <span class="str">"Starter"</span>, price: <span class="str">"Free"</span>, seats: 5 },
+  { name: <span class="str">"Team"</span>,    price: <span class="str">"$12/seat"</span> },
+];</pre>
+            </div>
+
+            <!-- Capture line drawn between Claude input and icon -->
+            <svg class="capture-line" id="captureLine" preserveAspectRatio="none">
+              <path id="captureLinePath" d="" />
+            </svg>
+            <div class="capture-land" id="captureLand"></div>
+          </div>
+
+          <!-- Menubar (persistent — does NOT slide with apps) -->
+          <div class="menubar" id="menubar">
+            <div class="avatar" id="avatar">M</div>
+            <div class="clock" id="clock">9:42 AM</div>
+          </div>
+
+          <!-- Trace icon (persistent — does NOT slide with apps) -->
+          <div class="icon" id="traceIcon">
+            <svg viewBox="0 0 100 100" width="100%" height="100%">
+              <rect class="icon-bg" x="0" y="0" width="100" height="100" rx="22" />
+              <path class="icon-path" d="M 22 70 C 35 70, 40 40, 55 40 S 78 62, 78 30" />
+              <g class="icon-dots">
+                <circle cx="22" cy="70" r="4.5" />
+                <circle cx="55" cy="40" r="4.5" />
+              </g>
+              <circle class="icon-dot-live" cx="78" cy="30" r="6" />
+            </svg>
+            <div class="icon-badge" id="iconBadge">1</div>
+          </div>
+
+          <!-- Quick-look panel -->
+          <div class="quicklook" id="quicklook" role="dialog" aria-label="Trace quick look">
+            <div class="ql-label">Projects updated</div>
+            <div class="ql-row" id="qlRow1">
+              <div class="src claude">C</div>
+              <div class="body">
+                <div class="title">Pricing page — tier table v2</div>
+                <div class="meta">from Alex · 2m ago · Claude</div>
+              </div>
+              <button class="pull-btn">Pull</button>
+              <div class="check">✓</div>
+            </div>
+            <div class="ql-row" id="qlRow2">
+              <div class="src gpt">G</div>
+              <div class="body">
+                <div class="title">Onboarding email — final copy</div>
+                <div class="meta">from Alex · 4m ago · ChatGPT</div>
+              </div>
+              <button class="pull-btn">Pull</button>
+              <div class="check">✓</div>
+            </div>
+            <div class="ql-divider"></div>
+            <div class="ql-label">Tasks / branches</div>
+            <div class="ql-row" id="qlRow3">
+              <div class="src cursor">▲</div>
+              <div class="body">
+                <div class="title">pricing/tier-table-v2</div>
+                <div class="meta">branch · 1 commit · Cursor</div>
+              </div>
+              <button class="pull-btn">Pull</button>
+              <div class="check">✓</div>
+            </div>
+          </div>
+
+          <!-- Stylized cursor -->
+          <div class="cursor" id="cursor" style="left:50%; top:50%">
+            <svg viewBox="0 0 20 20"><path d="M2 2 L2 15 L6 11 L9 17 L11 16 L8 10 L14 10 Z" fill="#fff" stroke="#0f1115" stroke-width="1.2" stroke-linejoin="round"/></svg>
+          </div>
+
+          <!-- Context-switch banner ("Now on Alex's Mac") -->
+          <div class="switch-banner" id="switchBanner">
+            <span class="dot"></span>
+            <span id="switchBannerText">Now on Alex's Mac</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="cta-row">
+      <button class="cta cta-primary">Download for Mac</button>
+      <button class="cta cta-secondary">View on GitHub ↗</button>
+    </div>
+  </main>
+
+  <script>
+    const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+    const $ = (id) => document.getElementById(id);
+    const prefersReducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const COOKIE = 'trace_hero_seen';
+    const COOKIE_DAYS = 30;
+
+    function setCookie(name, val, days) {
+      const d = new Date(); d.setTime(d.getTime() + days*24*60*60*1000);
+      document.cookie = `${name}=${val}; expires=${d.toUTCString()}; path=/`;
+    }
+    function getCookie(name) {
+      return document.cookie.split('; ').find(r => r.startsWith(name + '='))?.split('=')[1];
+    }
+
+    async function typeInto(el, text, perChar = 34) {
+      el.textContent = '';
+      for (const ch of text) {
+        el.textContent += ch;
+        await sleep(perChar);
+      }
+    }
+
+    // Capture line path: curve from Claude input → docked icon. All coords in STAGE space.
+    function updateCaptureLinePath() {
+      const stage = $('stage').getBoundingClientRect();
+      const claude = $('winClaude').getBoundingClientRect();
+      const icon = $('traceIcon').getBoundingClientRect();
+      const startX = claude.right - stage.left - 40;
+      const startY = claude.bottom - stage.top - 28;
+      const endX = icon.left + icon.width/2 - stage.left;
+      const endY = icon.top + icon.height/2 - stage.top;
+      const midX = (startX + endX) / 2;
+      const midY = Math.min(startY, endY) - 90;
+      const d = `M ${startX} ${startY} Q ${midX} ${midY}, ${endX} ${endY}`;
+      const svg = $('captureLine');
+      svg.setAttribute('viewBox', `0 0 ${stage.width} ${stage.height - 32}`);
+      svg.setAttribute('width', stage.width);
+      svg.setAttribute('height', stage.height - 32);
+      $('captureLinePath').setAttribute('d', d);
+      // Position the capture-land ripple on the icon center (stage-relative)
+      const land = $('captureLand');
+      land.style.left = (endX - 5) + 'px';
+      land.style.top  = (endY - 5) + 'px';
+    }
+
+    let sequenceSkipped = false;
+
+    function finalRestingState() {
+      // end state = desktop 2 with quick-look open, pulled item checked, VS Code visible
+      // but we'll keep it cleaner: menubar + icon persistent, apps visible
+      $('skipPill').classList.remove('visible');
+      $('replayPill').classList.add('visible');
+    }
+
+    function skipToEnd() {
+      sequenceSkipped = true;
+      // Short-circuit the sequence by jumping to a clean end state.
+      $('traceIcon').classList.remove('drop-in');
+      $('traceIcon').classList.add('docked', 'blink');
+      $('traceIcon').style.opacity = 1;
+      $('menubar').classList.add('visible');
+      $('avatar').classList.add('visible');
+      $('clock').textContent = '6:17 PM';
+      $('wallpaper').classList.add('visible', 'desk-2');
+      $('winGpt').classList.add('visible');
+      $('quicklook').classList.add('visible');
+      ['qlRow1','qlRow2','qlRow3'].forEach(id => $(id).classList.add('visible'));
+      $('iconBadge').textContent = '3';
+      $('iconBadge').classList.add('visible');
+      finalRestingState();
+    }
+
+    async function playSequence() {
+      sequenceSkipped = false;
+      $('replayPill').classList.remove('visible');
+      $('skipPill').classList.add('visible');
+
+      // FRAME 1: empty stage, held
+      await sleep(500); if (sequenceSkipped) return;
+
+      // FRAME 2: icon drops in at center of stage
+      $('traceIcon').classList.add('drop-in');
+      await sleep(900); if (sequenceSkipped) return;
+
+      // FRAME 3: icon docks to stage menubar, menubar appears underneath
+      $('traceIcon').classList.remove('drop-in');
+      $('traceIcon').classList.add('docked');
+      $('menubar').classList.add('visible');
+      $('clock').textContent = '9:42 AM';
+      await sleep(700); if (sequenceSkipped) return;
+
+      // FRAME 4: wallpaper (desktop 1) fades in, icon starts blinking
+      $('wallpaper').classList.add('visible');
+      $('traceIcon').classList.add('blink');
+      await sleep(750); if (sequenceSkipped) return;
+
+      // FRAME 5: Claude window appears
+      $('winClaude').classList.add('visible');
+      await sleep(650); if (sequenceSkipped) return;
+
+      // FRAME 6: typed prompt
+      await typeInto($('typedClaude'), "Spec the pricing page changes for next week", 34);
+      if (sequenceSkipped) return;
+      await sleep(250); if (sequenceSkipped) return;
+
+      // FRAME 7: send + capture line flies to icon
+      $('sendBtn').classList.add('press');
+      await sleep(150);
+      $('sendBtn').classList.remove('press');
+
+      updateCaptureLinePath();
+      $('captureLine').classList.add('visible');
+      const linePath = $('captureLinePath');
+      const len = linePath.getTotalLength();
+      linePath.style.strokeDasharray = `${len}`;
+      linePath.style.strokeDashoffset = `${len}`;
+      linePath.getBoundingClientRect(); // reflow
+      linePath.style.transition = 'stroke-dashoffset 520ms cubic-bezier(.4,0,.2,1)';
+      linePath.style.strokeDashoffset = '0';
+      await sleep(520); if (sequenceSkipped) return;
+
+      // Icon pulses + ripple on landing
+      $('traceIcon').classList.add('pulse');
+      $('captureLand').classList.add('visible');
+      await sleep(80);
+      $('captureLine').classList.remove('visible');
+      await sleep(500);
+      $('traceIcon').classList.remove('pulse');
+      $('captureLand').classList.remove('visible');
+      await sleep(150);
+
+      // FRAME 8: CONTEXT SWITCH (icon stays; apps slide out left, new desk slides in from right)
+      // Show the banner — tells the viewer unambiguously we changed machines
+      $('switchBannerText').textContent = "Now on Alex's Mac";
+      $('switchBanner').classList.add('visible');
+
+      // Slide current apps out
+      $('appsLayer').classList.add('slide-out-left');
+      await sleep(500); if (sequenceSkipped) return;
+
+      // Swap under the hood: hide desk-1 windows, show desk-2 wallpaper + menubar changes
+      $('winClaude').classList.remove('visible');
+      $('winGpt').classList.remove('visible');
+      $('winCode').classList.remove('visible');
+      $('wallpaper').classList.add('desk-2');
+      $('avatar').classList.add('visible');
+      $('clock').textContent = '6:17 PM';
+
+      // Move apps layer to start-right position instantly, then slide in
+      const apps = $('appsLayer');
+      apps.classList.remove('slide-out-left');
+      apps.classList.add('prep-right');
+      void apps.offsetWidth; // reflow
+      apps.classList.remove('prep-right');
+
+      // Reveal ChatGPT on the "new" desk
+      $('winGpt').classList.add('visible');
+      await sleep(550); if (sequenceSkipped) return;
+
+      $('switchBanner').classList.remove('visible');
+      await sleep(200);
+
+      // FRAME 9: counter ticks 1 → 2 → 3
+      const badge = $('iconBadge');
+      badge.textContent = '1';
+      badge.classList.add('visible');
+      await sleep(550); if (sequenceSkipped) return;
+      badge.textContent = '2';
+      badge.classList.remove('bump'); void badge.offsetWidth; badge.classList.add('bump');
+      await sleep(520); if (sequenceSkipped) return;
+      badge.textContent = '3';
+      badge.classList.remove('bump'); void badge.offsetWidth; badge.classList.add('bump');
+      await sleep(600); if (sequenceSkipped) return;
+
+      // FRAME 10: cursor moves to icon, clicks
+      const cursor = $('cursor');
+      const stageRect = $('stage').getBoundingClientRect();
+      cursor.classList.add('visible');
+      // start somewhere on the desktop
+      cursor.style.left = '52%';
+      cursor.style.top = '55%';
+      await sleep(40);
+      const iconRect = $('traceIcon').getBoundingClientRect();
+      cursor.style.left = (iconRect.left + iconRect.width/2 - stageRect.left - 4) + 'px';
+      cursor.style.top = (iconRect.top + iconRect.height/2 - stageRect.top + 8) + 'px';
+      await sleep(650); if (sequenceSkipped) return;
+
+      $('traceIcon').classList.add('pulse');
+      await sleep(180);
+      $('traceIcon').classList.remove('pulse');
+
+      // FRAME 11: quick-look panel opens, rows stagger in
+      $('winGpt').classList.remove('visible');
+      $('quicklook').classList.add('visible');
+      const rows = ['qlRow1','qlRow2','qlRow3'];
+      for (let i = 0; i < rows.length; i++) {
+        await sleep(130);
+        $(rows[i]).classList.add('visible');
+      }
+      await sleep(450); if (sequenceSkipped) return;
+
+      // FRAME 12: hover the third row (branch), click Pull
+      const row3 = $('qlRow3').getBoundingClientRect();
+      cursor.style.left = (row3.right - stageRect.left - 46) + 'px';
+      cursor.style.top = (row3.top + row3.height/2 - stageRect.top - 4) + 'px';
+      $('qlRow3').classList.add('hot');
+      await sleep(600); if (sequenceSkipped) return;
+
+      cursor.style.transform = 'scale(0.86)';
+      await sleep(120);
+      cursor.style.transform = 'scale(1)';
+      $('qlRow3').classList.add('pulled');
+
+      // Decrement badge count to 2 since we pulled one
+      badge.textContent = '2';
+      badge.classList.remove('bump'); void badge.offsetWidth; badge.classList.add('bump');
+
+      // FRAME 13: VS Code window appears below
+      $('winCode').classList.add('visible');
+      await sleep(1200); if (sequenceSkipped) return;
+
+      // FRAME 14: rest — keep the stage populated so viewer can see the end state
+      cursor.classList.remove('visible');
+      finalRestingState();
+      setCookie(COOKIE, '1', COOKIE_DAYS);
+    }
+
+    function resetStage() {
+      $('traceIcon').classList.remove('drop-in', 'docked', 'blink', 'pulse');
+      $('traceIcon').style.opacity = '';
+      $('iconBadge').classList.remove('visible', 'bump');
+      $('menubar').classList.remove('visible');
+      $('avatar').classList.remove('visible');
+      $('wallpaper').classList.remove('visible', 'desk-2');
+      ['winClaude','winGpt','winCode','quicklook','cursor','captureLine','captureLand','switchBanner'].forEach(id => {
+        $(id).classList.remove('visible');
+      });
+      $('appsLayer').classList.remove('slide-out-left','prep-right');
+      $('typedClaude').textContent = '';
+      ['qlRow1','qlRow2','qlRow3'].forEach(id => $(id).classList.remove('visible','hot','pulled'));
+      const lp = $('captureLinePath');
+      lp.style.strokeDasharray = '';
+      lp.style.strokeDashoffset = '';
+      lp.style.transition = '';
+      lp.setAttribute('d','');
+      const cursor = $('cursor');
+      cursor.style.transform = '';
+      cursor.style.left = '50%';
+      cursor.style.top = '50%';
+    }
+
+    $('skipPill').addEventListener('click', skipToEnd);
+    $('replayPill').addEventListener('click', () => { resetStage(); playSequence(); });
+
+    window.addEventListener('load', () => {
+      if (prefersReducedMotion) { skipToEnd(); return; }
+      if (getCookie(COOKIE))     { skipToEnd(); return; }
+      playSequence();
+    });
+
+    window.addEventListener('resize', () => {
+      if ($('captureLine').classList.contains('visible')) updateCaptureLinePath();
+    });
+  </script>
+</body>
+</html>
