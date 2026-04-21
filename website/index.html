@@ -527,11 +527,13 @@
       justify-content: center;
     }
     .cta {
+      display: inline-flex; align-items: center; justify-content: center;
       padding: 11px 20px; border-radius: 10px;
       font-size: 14px; font-weight: 500; letter-spacing: -0.005em;
       border: 1px solid transparent;
       cursor: pointer;
       font-family: var(--font);
+      text-decoration: none;
       transition: transform 120ms ease, box-shadow 140ms ease;
     }
     .cta:hover { transform: translateY(-1px); }
@@ -737,7 +739,7 @@
 
     <div class="cta-row">
       <button class="cta cta-primary">Download for Mac</button>
-      <button class="cta cta-secondary">View on GitHub ↗</button>
+      <a class="cta cta-secondary" href="https://github.com/talsolomon/DubleSlash" target="_blank" rel="noopener">View on GitHub ↗</a>
     </div>
   </main>
 

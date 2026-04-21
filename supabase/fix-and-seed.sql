@@ -84,7 +84,9 @@ insert into public.tasks (id, title, group_id, owner_id, status_id, priority_id,
 on conflict (id) do nothing;
 
 insert into public.repo_commits (sha, msg, feeds) values
-  ('c34c4e4', 'Redesign website hero: larger stage, refined menubar icon, quicklook tail', 'DES-001'),
+  ('ab0693f', 'Rename DoubleSlash to DubleSlash across the repo',                           null),
+  ('5447b8a', 'Add FISH methodology, Supabase task board, finish Double Slash rename',      'FISH-001'),
+  ('c34c4e4', 'Redesign website hero: larger stage, refined menubar icon, quicklook tail',  'DES-001'),
   ('f3c9448', 'Merge #1 from import/collab-workspace',                                      null),
   ('2a6cda7', 'Add Trace planning artifacts, BMAD docs, and website',                       null),
   ('bb9b228', 'Initial commit',                                                             null)

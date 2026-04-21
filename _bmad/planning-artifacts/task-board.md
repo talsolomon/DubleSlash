@@ -7,7 +7,7 @@ type: planning-artifact
 # Duble Slash — Task Board
 
 **Last updated:** 2026-04-21 · **Owner:** Tal + Shenhav · **Source of truth:** this file.
-Mirrors [GitHub repo](https://github.com/talsolomon/collab) issues/commits where applicable.
+Mirrors [GitHub repo](https://github.com/talsolomon/DubleSlash) issues/commits where applicable.
 
 **Legend** — Status: 📋 Todo · 🔄 In Progress · 🟡 Blocked · 🔍 Review · ✅ Done · ❄️ Parked
 **Priority:** P0 (this week) · P1 (this sprint) · P2 (backlog)
@@ -116,9 +116,11 @@ Per the 2026-04-21 reframe, FISH is the product's soul and the OSS drop. This gr
 
 ## 🔗 GitHub Sync
 
-**Repo:** [talsolomon/collab](https://github.com/talsolomon/collab) · **Issues open:** 0 · **Branch:** main
+**Repo:** [talsolomon/DubleSlash](https://github.com/talsolomon/DubleSlash) · **Issues open:** 0 · **Branch:** main
 
 **Recent commits (context for this board):**
+- `ab0693f` — Rename DoubleSlash to DubleSlash across the repo
+- `5447b8a` — Add FISH methodology, Supabase task board, finish Double Slash rename
 - `c34c4e4` — Redesign website hero: larger stage, refined menubar icon, quicklook tail *(feeds DES-001)*
 - `f3c9448` — Merge #1 from import/collab-workspace
 - `2a6cda7` — Add Trace planning artifacts, BMAD docs, and website
