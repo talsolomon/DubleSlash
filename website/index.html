@@ -89,25 +89,10 @@
     /* ---------- Hero layout ---------- */
     .hero {
       min-height: 100vh;
-      padding: 96px 24px 64px;
+      padding: 72px 24px 48px;
       display: flex; flex-direction: column; align-items: center;
-      gap: 40px;
-    }
-    .hero-copy {
-      text-align: center; max-width: 780px;
-      display: flex; flex-direction: column; align-items: center; gap: 16px;
-    }
-    .hero-copy h1 {
-      font-size: clamp(36px, 5vw, 60px);
-      line-height: 1.02; letter-spacing: -0.025em;
-      font-weight: 600;
-      margin: 0;
-      max-width: 18ch;
-    }
-    .hero-copy p {
-      font-size: clamp(15px, 1.2vw, 18px);
-      color: var(--ink-2); line-height: 1.5;
-      margin: 0; max-width: 54ch;
+      justify-content: center;
+      gap: 28px;
     }
 
     /* ---------- Stage wrapper (holds stage + skip/replay + cta below) ---------- */
@@ -351,8 +336,8 @@
       min-height: 50px;
       display: flex; align-items: center;
       position: relative;
-      overflow: hidden;
     }
+    .win-claude .chat-area { position: relative; }
     .typed { white-space: pre; }
     .caret {
       display: inline-block; width: 1.5px; height: 14px;
@@ -387,33 +372,194 @@
       border: 1px solid rgba(16,163,127,0.18);
     }
 
-    /* VS Code (pull reveal) */
-    .win-code {
-      width: 560px; height: 220px;
-      left: 46%; top: 56%;
+    /* GitHub-style PR panel (replaces VS Code reveal) */
+    .win-pr {
+      width: 560px; height: 232px;
+      left: 46%; top: 54%;
       transform: translate(-50%, 20px) scale(0.96);
-      background: var(--code);
-      color: #e5e5f0;
+      background: #ffffff;
+      color: var(--ink);
+      border: 1px solid #d0d7de;
     }
-    .win-code.visible { transform: translate(-50%, 0) scale(1); }
-    .win-code .titlebar { background: #2a2a3e; border-color: #00000033; color: #c5c5d5; }
-    .win-code .titlebar .traffic span { background: #4a4a5e; }
-    .win-code .branch {
-      padding: 12px 16px 6px; font-family: var(--mono); font-size: 11.5px; color: #a0a0c0;
+    .win-pr.visible { transform: translate(-50%, 0) scale(1); }
+    .win-pr .titlebar {
+      background: #f6f8fa; border-color: #d0d7de; color: var(--ink-2);
+      font-size: 11.5px;
+    }
+    .win-pr .titlebar .gh-mark {
+      width: 14px; height: 14px; border-radius: 50%;
+      background: #1f2328;
+      display: inline-flex; align-items: center; justify-content: center;
+      color: white; font-size: 9px; font-weight: 700;
+    }
+    .win-pr .pr-head {
+      padding: 12px 16px 8px;
       display: flex; align-items: center; gap: 8px;
+      border-bottom: 1px solid #e6e3db;
+      font-size: 12px;
     }
-    .win-code .branch .badge {
-      background: rgba(217,138,43,0.22); color: var(--accent-soft);
-      padding: 2px 7px; border-radius: 5px; font-size: 10px; letter-spacing: 0.03em;
+    .win-pr .pr-head .pr-title { font-weight: 600; color: var(--ink); }
+    .win-pr .pr-head .pr-num { color: var(--muted); }
+    .win-pr .pr-head .pr-state {
+      margin-left: auto;
+      background: #dafbe1; color: #1a7f37;
+      font-size: 10.5px; font-weight: 600;
+      padding: 2px 8px; border-radius: 999px;
+      border: 1px solid rgba(26,127,55,0.25);
     }
-    .win-code pre {
-      margin: 0; padding: 8px 16px 16px; font-family: var(--mono); font-size: 11.5px;
-      color: #c8c8e0; line-height: 1.55;
+    .win-pr .pr-meta {
+      padding: 8px 16px; font-size: 11px; color: var(--muted);
+      display: flex; align-items: center; gap: 10px;
+      border-bottom: 1px solid #e6e3db;
+      font-family: var(--mono);
     }
-    .win-code .kw { color: #b48cff; }
-    .win-code .str { color: #f2c892; }
-    .win-code .fn { color: #87d3ff; }
-    .win-code .cm { color: #70708a; }
+    .win-pr .pr-meta .branch-chip {
+      background: #ddf4ff; color: #0969da;
+      padding: 1px 7px; border-radius: 5px;
+      font-size: 10.5px; border: 1px solid rgba(9,105,218,0.2);
+    }
+    .win-pr .pr-meta .stats { margin-left: auto; display: flex; gap: 6px; align-items: center; }
+    .win-pr .pr-meta .add { color: #1a7f37; font-weight: 600; }
+    .win-pr .pr-meta .del { color: #cf222e; font-weight: 600; }
+    .win-pr .pr-diff {
+      padding: 8px 0;
+      font-family: var(--mono); font-size: 11px;
+      line-height: 1.55;
+    }
+    .win-pr .pr-diff .line {
+      padding: 0 16px;
+      display: block;
+    }
+    .win-pr .pr-diff .line.add { background: #e6ffec; color: #1a7f37; }
+    .win-pr .pr-diff .line.del { background: #ffebe9; color: #cf222e; }
+    .win-pr .pr-diff .line.ctx { color: var(--ink-2); }
+
+    /* Linear-style card (platform layer — Linear view with FISH phase) */
+    .win-linear {
+      width: 240px; height: 232px;
+      left: 6%; top: 54%;
+      background: #1b1c25;
+      color: #e2e2ea;
+      border: 1px solid #2d2e3a;
+    }
+    .win-linear .titlebar {
+      background: #23242f; border-color: #2d2e3a; color: #c4c5d2;
+      font-size: 11.5px;
+    }
+    .win-linear .linear-mark {
+      width: 14px; height: 14px; border-radius: 4px;
+      background: linear-gradient(135deg, #5e6ad2, #8b93ed);
+    }
+    .win-linear .fish-phases {
+      display: flex; gap: 4px;
+      padding: 10px 12px 8px;
+      font-size: 9.5px; text-transform: uppercase; letter-spacing: 0.06em;
+      color: #8a8ba0;
+    }
+    .win-linear .fish-phase {
+      padding: 3px 6px; border-radius: 4px;
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+    .win-linear .fish-phase.active {
+      background: rgba(61,217,182,0.12); color: var(--brand-accent);
+      border-color: rgba(61,217,182,0.35);
+    }
+    .win-linear .lin-card {
+      margin: 4px 10px; padding: 9px 10px;
+      background: #23242f; border: 1px solid #2d2e3a;
+      border-radius: 7px;
+      font-size: 11.5px;
+      opacity: 0; transform: translateY(4px);
+      transition: opacity 400ms ease, transform 400ms ease;
+    }
+    .win-linear .lin-card.visible { opacity: 1; transform: translateY(0); }
+    .win-linear .lin-card.new {
+      box-shadow: 0 0 0 1.5px rgba(61,217,182,0.5);
+    }
+    .win-linear .lin-card .id {
+      font-family: var(--mono); font-size: 10px; color: #8a8ba0;
+      margin-bottom: 3px;
+    }
+    .win-linear .lin-card .title {
+      color: #e2e2ea; line-height: 1.35;
+    }
+    .win-linear .lin-card .phase-chip {
+      display: inline-block;
+      margin-top: 6px;
+      font-size: 9.5px; text-transform: uppercase; letter-spacing: 0.05em;
+      padding: 1px 6px; border-radius: 4px;
+      background: rgba(61,217,182,0.14); color: var(--brand-accent);
+      border: 1px solid rgba(61,217,182,0.3);
+    }
+
+    /* FISH palette — appears inline when user types // */
+    .fish-palette {
+      position: absolute;
+      left: 14px; right: 14px; bottom: calc(100% + 6px);
+      background: white;
+      border: 1px solid var(--hair);
+      border-radius: 10px;
+      padding: 6px;
+      box-shadow: 0 10px 24px rgba(15,17,21,0.14);
+      opacity: 0; transform: translateY(4px);
+      transition: opacity 220ms ease, transform 220ms ease;
+      z-index: 5;
+      display: flex; align-items: center; gap: 4px;
+      font-size: 11px;
+    }
+    .fish-palette.visible { opacity: 1; transform: translateY(0); }
+    .fish-palette .fp-label {
+      font-size: 9.5px; text-transform: uppercase; letter-spacing: 0.08em;
+      color: var(--muted); padding: 0 8px 0 4px;
+      border-right: 1px solid var(--hair); margin-right: 4px;
+    }
+    .fish-palette .fp-item {
+      padding: 4px 9px; border-radius: 6px;
+      color: var(--ink-2); font-weight: 500;
+      transition: background 180ms ease, color 180ms ease;
+    }
+    .fish-palette .fp-item.active {
+      background: rgba(61,217,182,0.16);
+      color: var(--brand-dark);
+    }
+
+    /* Agents-ran strip — confirms the agents actually did something.
+       Positioned above the input (inside the Claude window) so it isn't clipped. */
+    .agent-strip {
+      position: absolute;
+      left: 18px; right: 18px; bottom: 106px;
+      display: flex; gap: 6px; flex-wrap: wrap;
+      font-size: 10.5px;
+      opacity: 0; transform: translateY(4px);
+      transition: opacity 260ms ease, transform 260ms ease;
+      z-index: 4;
+    }
+    .agent-strip.visible { opacity: 1; transform: translateY(0); }
+    .agent-chip {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 3px 8px; border-radius: 999px;
+      background: white;
+      border: 1px solid var(--hair);
+      color: var(--ink-2);
+      font-family: var(--font);
+    }
+    .agent-chip .dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: #2b8a3e;
+      box-shadow: 0 0 0 2px rgba(43,138,62,0.18);
+    }
+    .agent-chip.redact .dot { background: var(--accent); box-shadow: 0 0 0 2px rgba(217,138,43,0.22); }
+    .agent-chip .check { color: #2b8a3e; font-size: 11px; }
+
+    /* Cursor press + button pressed feedback (so clicks don't look like "air") */
+    .cursor.press { transform: scale(0.82); transition: transform 140ms ease; }
+    .pull-btn.pressing {
+      background: rgba(217,138,43,0.18);
+      border-color: var(--accent) !important;
+      color: var(--accent);
+      transform: scale(0.96);
+    }
+    .icon.click-press svg { transform: scale(0.88); transition: transform 140ms ease; }
 
     /* ---------- Capture trace line ---------- */
     .capture-line {
@@ -544,6 +690,25 @@
     .cta-secondary { background: transparent; color: var(--ink); border-color: rgba(15,17,21,0.16); }
     .cta-secondary:hover { background: rgba(15,17,21,0.04); }
 
+    /* Workshop invite — sits below the two main CTAs as a link-style button */
+    .workshop-link {
+      margin-top: 4px;
+      display: inline-flex; align-items: center; gap: 6px;
+      background: transparent; border: 0; cursor: pointer;
+      font-family: var(--font);
+      font-size: 13.5px; font-weight: 500;
+      color: var(--brand-dark);
+      text-decoration: none;
+      padding: 6px 2px;
+      border-bottom: 1px solid rgba(14,58,53,0.22);
+      transition: color 140ms ease, border-color 140ms ease;
+    }
+    .workshop-link:hover {
+      color: var(--brand-accent);
+      border-bottom-color: var(--brand-accent);
+    }
+    .workshop-link .arrow { font-size: 14px; }
+
     /* ---------- Context-switch banner (brief overlay inside stage) ---------- */
     .switch-banner {
       position: absolute;
@@ -574,11 +739,13 @@
 
     /* ---------- Mobile ---------- */
     @media (max-width: 720px) {
-      :root { --stage-h: 460px; }
+      :root { --stage-h: 480px; }
       .win-claude { width: 85%; left: 7.5%; }
       .win-gpt { width: 85%; left: 7.5%; }
-      .win-code { width: 90%; }
+      .win-pr { width: 78%; left: 50%; top: 62%; height: 170px; }
+      .win-linear { display: none; } /* hidden on mobile — PR view carries the story */
       .quicklook { width: 78%; right: 6%; }
+      .fish-palette .fp-label { display: none; }
     }
   </style>
 </head>
@@ -594,10 +761,7 @@
   </a>
 
   <main class="hero">
-    <div class="hero-copy">
-      <h1>Your team's AI work, wherever you pick it up.</h1>
-      <p>Duble Slash captures what your team does across Claude, ChatGPT, and Cursor — and lands it on the machine you're working on now.</p>
-    </div>
+    <h1 class="visually-hidden" style="position:absolute;left:-10000px;width:1px;height:1px;overflow:hidden">Duble Slash — your team's AI work, wherever you pick it up.</h1>
 
     <div class="stage-wrap">
       <button class="skip-pill" id="skipPill" aria-label="Skip intro">Skip intro</button>
@@ -623,7 +787,20 @@
                 <div>Claude</div>
               </div>
               <div class="chat-area">
+                <!-- Agents confirm what they did (floats above the input) -->
+                <div class="agent-strip" id="agentStrip" aria-hidden="true">
+                  <span class="agent-chip"><span class="dot"></span>Capture agent<span class="check">✓</span></span>
+                  <span class="agent-chip redact"><span class="dot"></span>Redaction agent · 2 hidden<span class="check">✓</span></span>
+                </div>
                 <div class="input">
+                  <!-- FISH palette appears inline when user types // -->
+                  <div class="fish-palette" id="fishPalette" aria-hidden="true">
+                    <span class="fp-label">FISH</span>
+                    <span class="fp-item" id="fpExplore">Explore</span>
+                    <span class="fp-item">Solidify</span>
+                    <span class="fp-item">Build</span>
+                    <span class="fp-item">Ship</span>
+                  </div>
                   <span class="typed" id="typedClaude"></span><span class="caret"></span>
                   <div class="send-btn" id="sendBtn">↵</div>
                 </div>
@@ -642,21 +819,55 @@
               </div>
             </div>
 
-            <div class="window win-code" id="winCode">
+            <!-- Linear-layer view: FISH-organized task board -->
+            <div class="window win-linear" id="winLinear">
               <div class="titlebar">
                 <div class="traffic"><span></span><span></span><span></span></div>
-                <div style="color:#c5c5d5">pricing-refresh.tsx — VS Code</div>
+                <div class="linear-mark" aria-hidden="true"></div>
+                <div>Linear · FISH</div>
               </div>
-              <div class="branch">
-                <span class="badge">branch</span>
-                <span>pricing/tier-table-v2</span>
-                <span style="color:#70708a"> • pulled from Duble Slash</span>
+              <div class="fish-phases" aria-hidden="true">
+                <span class="fish-phase active">Explore</span>
+                <span class="fish-phase">Solidify</span>
+                <span class="fish-phase">Build</span>
+                <span class="fish-phase">Ship</span>
               </div>
-<pre><span class="cm">// Draft from Alex, captured via Claude</span>
-<span class="kw">export</span> <span class="kw">const</span> <span class="fn">tiers</span> = [
-  { name: <span class="str">"Starter"</span>, price: <span class="str">"Free"</span>, seats: 5 },
-  { name: <span class="str">"Team"</span>,    price: <span class="str">"$12/seat"</span> },
-];</pre>
+              <div class="lin-card" id="linCard1">
+                <div class="id">PRICE-42</div>
+                <div class="title">Pricing page — tier table refresh</div>
+                <div class="phase-chip">Explore</div>
+              </div>
+              <div class="lin-card new" id="linCard2">
+                <div class="id">PRICE-43</div>
+                <div class="title">Spec pricing page changes for next week</div>
+                <div class="phase-chip">Explore · new</div>
+              </div>
+            </div>
+
+            <!-- GitHub-layer view: PR with diff -->
+            <div class="window win-pr" id="winPR">
+              <div class="titlebar">
+                <div class="traffic"><span></span><span></span><span></span></div>
+                <div class="gh-mark" aria-hidden="true">⎇</div>
+                <div>github.com · talteam/marketing</div>
+              </div>
+              <div class="pr-head">
+                <span class="pr-title">Pricing page — tier table v2</span>
+                <span class="pr-num">#142</span>
+                <span class="pr-state">Open</span>
+              </div>
+              <div class="pr-meta">
+                <span class="branch-chip">pricing/tier-table-v2</span>
+                <span>pulled from Duble Slash</span>
+                <span class="stats"><span class="add">+12</span><span class="del">−3</span></span>
+              </div>
+              <div class="pr-diff">
+                <span class="line ctx">export const tiers = [</span>
+                <span class="line del">−  { name: "Starter", price: "Free" },</span>
+                <span class="line add">+  { name: "Starter", price: "Free", seats: 5 },</span>
+                <span class="line add">+  { name: "Team",    price: "$12/seat" },</span>
+                <span class="line ctx">];</span>
+              </div>
             </div>
 
             <!-- Capture line drawn between Claude input and icon -->
@@ -741,6 +952,10 @@
       <button class="cta cta-primary">Download for Mac</button>
       <a class="cta cta-secondary" href="https://github.com/talsolomon/DubleSlash" target="_blank" rel="noopener">View on GitHub ↗</a>
     </div>
+    <a class="workshop-link" href="mailto:talsolomon21@gmail.com?subject=DubleSlash%20workshop%20request">
+      Want a DubleSlash workshop at your place? let's talk!
+      <span class="arrow" aria-hidden="true">→</span>
+    </a>
   </main>
 
   <script>
@@ -760,6 +975,13 @@
 
     async function typeInto(el, text, perChar = 34) {
       el.textContent = '';
+      for (const ch of text) {
+        el.textContent += ch;
+        await sleep(perChar);
+      }
+    }
+
+    async function typeAppend(el, text, perChar = 34) {
       for (const ch of text) {
         el.textContent += ch;
         await sleep(perChar);
@@ -798,14 +1020,21 @@
       $('replayPill').classList.add('visible');
     }
 
+    // Moves the cursor element to the center of a target DOM node, in stage coords.
+    function cursorTo(cursor, target, offsetX = -2, offsetY = 4) {
+      const stageRect = $('stage').getBoundingClientRect();
+      const r = target.getBoundingClientRect();
+      cursor.style.left = (r.left + r.width/2 - stageRect.left + offsetX) + 'px';
+      cursor.style.top  = (r.top  + r.height/2 - stageRect.top  + offsetY) + 'px';
+    }
+
     function skipToEnd() {
       sequenceSkipped = true;
       const icon = $('traceIcon');
-      // suspend transitions while we snap into the end state
       icon.classList.add('instant');
       icon.classList.remove('drop-in');
       icon.classList.add('docked');
-      void icon.offsetWidth; // reflow
+      void icon.offsetWidth;
       icon.classList.remove('instant');
       icon.classList.add('blink');
 
@@ -813,10 +1042,14 @@
       $('avatar').classList.add('visible');
       $('clock').textContent = '6:17 PM';
       $('wallpaper').classList.add('visible', 'desk-2');
-      $('winGpt').classList.add('visible');
       $('quicklook').classList.add('visible');
       ['qlRow1','qlRow2','qlRow3'].forEach(id => $(id).classList.add('visible'));
-      $('iconBadge').textContent = '3';
+      $('qlRow3').classList.add('pulled');
+      $('winLinear').classList.add('visible');
+      $('linCard1').classList.add('visible');
+      $('linCard2').classList.add('visible');
+      $('winPR').classList.add('visible');
+      $('iconBadge').textContent = '2';
       $('iconBadge').classList.add('visible');
       finalRestingState();
     }
@@ -826,38 +1059,52 @@
       $('replayPill').classList.remove('visible');
       $('skipPill').classList.add('visible');
 
+      const cursor = $('cursor');
+      const stageRect = () => $('stage').getBoundingClientRect();
+
       // FRAME 1: empty stage, held
-      await sleep(500); if (sequenceSkipped) return;
+      await sleep(400); if (sequenceSkipped) return;
 
-      // FRAME 2: icon drops in at center of stage
+      // FRAME 2: icon drops in at center
       $('traceIcon').classList.add('drop-in');
-      await sleep(900); if (sequenceSkipped) return;
+      await sleep(800); if (sequenceSkipped) return;
 
-      // FRAME 3: icon docks to stage menubar, menubar appears underneath
+      // FRAME 3: icon docks to menubar
       $('traceIcon').classList.remove('drop-in');
       $('traceIcon').classList.add('docked');
       $('menubar').classList.add('visible');
       $('clock').textContent = '9:42 AM';
-      await sleep(700); if (sequenceSkipped) return;
+      await sleep(650); if (sequenceSkipped) return;
 
-      // FRAME 4: wallpaper (desktop 1) fades in, icon starts blinking
+      // FRAME 4: desktop 1 wallpaper, icon starts breathing
       $('wallpaper').classList.add('visible');
       $('traceIcon').classList.add('blink');
-      await sleep(750); if (sequenceSkipped) return;
+      await sleep(650); if (sequenceSkipped) return;
 
       // FRAME 5: Claude window appears
       $('winClaude').classList.add('visible');
-      await sleep(650); if (sequenceSkipped) return;
+      await sleep(550); if (sequenceSkipped) return;
 
-      // FRAME 6: typed prompt
-      await typeInto($('typedClaude'), "Spec the pricing page changes for next week", 34);
+      // FRAME 6a: user types `//` — FISH palette opens
+      await typeInto($('typedClaude'), "//", 80);
       if (sequenceSkipped) return;
-      await sleep(250); if (sequenceSkipped) return;
+      $('fishPalette').classList.add('visible');
+      await sleep(450); if (sequenceSkipped) return;
 
-      // FRAME 7: send + capture line flies to icon
+      // FRAME 6b: Explore phase highlights (agent picks the right phase)
+      $('fpExplore').classList.add('active');
+      await sleep(550); if (sequenceSkipped) return;
+
+      // FRAME 6c: the real prompt types in after //
+      await typeAppend($('typedClaude'), " spec pricing page changes for next week", 30);
+      if (sequenceSkipped) return;
+      await sleep(220); if (sequenceSkipped) return;
+
+      // FRAME 7: send button pressed — capture line flies to icon
       $('sendBtn').classList.add('press');
       await sleep(150);
       $('sendBtn').classList.remove('press');
+      $('fishPalette').classList.remove('visible');
 
       updateCaptureLinePath();
       $('captureLine').classList.add('visible');
@@ -865,12 +1112,11 @@
       const len = linePath.getTotalLength();
       linePath.style.strokeDasharray = `${len}`;
       linePath.style.strokeDashoffset = `${len}`;
-      linePath.getBoundingClientRect(); // reflow
+      linePath.getBoundingClientRect();
       linePath.style.transition = 'stroke-dashoffset 520ms cubic-bezier(.4,0,.2,1)';
       linePath.style.strokeDashoffset = '0';
       await sleep(520); if (sequenceSkipped) return;
 
-      // Icon pulses + ripple on landing
       $('traceIcon').classList.add('pulse');
       $('captureLand').classList.add('visible');
       await sleep(80);
@@ -878,66 +1124,64 @@
       await sleep(500);
       $('traceIcon').classList.remove('pulse');
       $('captureLand').classList.remove('visible');
-      await sleep(150);
 
-      // FRAME 8: CONTEXT SWITCH (icon stays; apps slide out left, new desk slides in from right)
-      // Show the banner — tells the viewer unambiguously we changed machines
+      // FRAME 7b: agents confirm they ran — "you get the agents"
+      $('agentStrip').classList.add('visible');
+      await sleep(900); if (sequenceSkipped) return;
+
+      // FRAME 8: CONTEXT SWITCH — apps slide out, new desk slides in
       $('switchBannerText').textContent = "Now on Alex's Mac";
       $('switchBanner').classList.add('visible');
-
-      // Slide current apps out
       $('appsLayer').classList.add('slide-out-left');
       await sleep(500); if (sequenceSkipped) return;
 
-      // Swap under the hood: hide desk-1 windows, show desk-2 wallpaper + menubar changes
       $('winClaude').classList.remove('visible');
       $('winGpt').classList.remove('visible');
-      $('winCode').classList.remove('visible');
+      $('winPR').classList.remove('visible');
+      $('winLinear').classList.remove('visible');
+      $('agentStrip').classList.remove('visible');
       $('wallpaper').classList.add('desk-2');
       $('avatar').classList.add('visible');
       $('clock').textContent = '6:17 PM';
 
-      // Move apps layer to start-right position instantly, then slide in
       const apps = $('appsLayer');
       apps.classList.remove('slide-out-left');
       apps.classList.add('prep-right');
-      void apps.offsetWidth; // reflow
+      void apps.offsetWidth;
       apps.classList.remove('prep-right');
 
-      // Reveal ChatGPT on the "new" desk
       $('winGpt').classList.add('visible');
       await sleep(550); if (sequenceSkipped) return;
-
       $('switchBanner').classList.remove('visible');
-      await sleep(200);
+      await sleep(180);
 
-      // FRAME 9: counter ticks 1 → 2 → 3
+      // FRAME 9: badge ticks 1 → 2 → 3 on the menubar icon
       const badge = $('iconBadge');
       badge.textContent = '1';
       badge.classList.add('visible');
-      await sleep(550); if (sequenceSkipped) return;
+      await sleep(500); if (sequenceSkipped) return;
       badge.textContent = '2';
       badge.classList.remove('bump'); void badge.offsetWidth; badge.classList.add('bump');
-      await sleep(520); if (sequenceSkipped) return;
+      await sleep(480); if (sequenceSkipped) return;
       badge.textContent = '3';
       badge.classList.remove('bump'); void badge.offsetWidth; badge.classList.add('bump');
-      await sleep(600); if (sequenceSkipped) return;
+      await sleep(520); if (sequenceSkipped) return;
 
-      // FRAME 10: cursor moves to icon, clicks
-      const cursor = $('cursor');
-      const stageRect = $('stage').getBoundingClientRect();
+      // FRAME 10: cursor flies to icon, clicks on the actual icon
       cursor.classList.add('visible');
-      // start somewhere on the desktop
-      cursor.style.left = '52%';
-      cursor.style.top = '55%';
+      cursor.style.left = '50%';
+      cursor.style.top  = '55%';
       await sleep(40);
-      const iconRect = $('traceIcon').getBoundingClientRect();
-      cursor.style.left = (iconRect.left + iconRect.width/2 - stageRect.left - 4) + 'px';
-      cursor.style.top = (iconRect.top + iconRect.height/2 - stageRect.top + 8) + 'px';
-      await sleep(650); if (sequenceSkipped) return;
+      cursorTo(cursor, $('traceIcon'), -2, 6);
+      await sleep(620); if (sequenceSkipped) return;
 
-      $('traceIcon').classList.add('pulse');
-      await sleep(180);
+      // Visible click: cursor presses, icon presses
+      cursor.classList.add('press');
+      $('traceIcon').classList.add('click-press', 'pulse');
+      await sleep(170);
+      cursor.classList.remove('press');
+      $('traceIcon').classList.remove('click-press');
+      await sleep(120);
       $('traceIcon').classList.remove('pulse');
 
       // FRAME 11: quick-look panel opens, rows stagger in
@@ -945,56 +1189,69 @@
       $('quicklook').classList.add('visible');
       const rows = ['qlRow1','qlRow2','qlRow3'];
       for (let i = 0; i < rows.length; i++) {
-        await sleep(130);
+        await sleep(120);
         $(rows[i]).classList.add('visible');
       }
-      await sleep(450); if (sequenceSkipped) return;
+      await sleep(380); if (sequenceSkipped) return;
 
-      // FRAME 12: hover the third row (branch), click Pull
-      const row3 = $('qlRow3').getBoundingClientRect();
-      cursor.style.left = (row3.right - stageRect.left - 46) + 'px';
-      cursor.style.top = (row3.top + row3.height/2 - stageRect.top - 4) + 'px';
-      $('qlRow3').classList.add('hot');
-      await sleep(600); if (sequenceSkipped) return;
+      // FRAME 12: cursor to the third row's Pull button — click lands ON the button
+      const row3 = $('qlRow3');
+      const pullBtn = row3.querySelector('.pull-btn');
+      row3.classList.add('hot');        // hover state fades in the button
+      await sleep(260);                  // wait for button to appear before targeting
+      cursorTo(cursor, pullBtn, -2, 2);
+      await sleep(520); if (sequenceSkipped) return;
 
-      cursor.style.transform = 'scale(0.86)';
-      await sleep(120);
-      cursor.style.transform = 'scale(1)';
-      $('qlRow3').classList.add('pulled');
+      // Press — cursor scales, button presses
+      cursor.classList.add('press');
+      pullBtn.classList.add('pressing');
+      await sleep(150);
+      cursor.classList.remove('press');
+      await sleep(60);
+      pullBtn.classList.remove('pressing');
+      row3.classList.add('pulled');
 
-      // Decrement badge count to 2 since we pulled one
       badge.textContent = '2';
       badge.classList.remove('bump'); void badge.offsetWidth; badge.classList.add('bump');
 
-      // FRAME 13: VS Code window appears below
-      $('winCode').classList.add('visible');
-      await sleep(1200); if (sequenceSkipped) return;
+      // FRAME 13: Linear + GitHub PR views appear — the platform's two layers
+      $('winLinear').classList.add('visible');
+      $('linCard1').classList.add('visible');
+      await sleep(220);
+      $('linCard2').classList.add('visible');
+      await sleep(160);
+      $('winPR').classList.add('visible');
+      await sleep(1500); if (sequenceSkipped) return;
 
-      // FRAME 14: rest — keep the stage populated so viewer can see the end state
+      // FRAME 14: rest
       cursor.classList.remove('visible');
       finalRestingState();
       setCookie(COOKIE, '1', COOKIE_DAYS);
     }
 
     function resetStage() {
-      $('traceIcon').classList.remove('drop-in', 'docked', 'blink', 'pulse');
+      $('traceIcon').classList.remove('drop-in', 'docked', 'blink', 'pulse', 'click-press');
       $('traceIcon').style.opacity = '';
       $('iconBadge').classList.remove('visible', 'bump');
       $('menubar').classList.remove('visible');
       $('avatar').classList.remove('visible');
       $('wallpaper').classList.remove('visible', 'desk-2');
-      ['winClaude','winGpt','winCode','quicklook','cursor','captureLine','captureLand','switchBanner'].forEach(id => {
-        $(id).classList.remove('visible');
+      ['winClaude','winGpt','winPR','winLinear','quicklook','cursor','captureLine','captureLand','switchBanner','fishPalette','agentStrip','linCard1','linCard2'].forEach(id => {
+        const el = $(id); if (el) el.classList.remove('visible');
       });
+      $('fpExplore').classList.remove('active');
       $('appsLayer').classList.remove('slide-out-left','prep-right');
       $('typedClaude').textContent = '';
       ['qlRow1','qlRow2','qlRow3'].forEach(id => $(id).classList.remove('visible','hot','pulled'));
+      const pb = document.querySelector('#qlRow3 .pull-btn');
+      if (pb) pb.classList.remove('pressing');
       const lp = $('captureLinePath');
       lp.style.strokeDasharray = '';
       lp.style.strokeDashoffset = '';
       lp.style.transition = '';
       lp.setAttribute('d','');
       const cursor = $('cursor');
+      cursor.classList.remove('press');
       cursor.style.transform = '';
       cursor.style.left = '50%';
       cursor.style.top = '50%';
