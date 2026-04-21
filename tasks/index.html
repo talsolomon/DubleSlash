@@ -301,6 +301,55 @@ input, select, textarea { font-family: inherit; font-size: inherit; color: inher
 .contact-tasks a:hover { color: var(--ink); }
 .contact-actions { display: inline-flex; gap: 2px; align-items: center; }
 
+.outreach-section { margin-bottom: 36px; }
+.outreach-section-header {
+  display: flex; align-items: center; gap: 10px;
+  margin: 0 0 12px; padding: 0 4px;
+}
+.outreach-section-header h3 {
+  margin: 0; font-size: 15px; font-weight: 600; letter-spacing: -0.01em;
+}
+.outreach-count {
+  font-family: var(--mono); font-size: 11px; color: var(--muted);
+  background: var(--hair); padding: 2px 8px; border-radius: 999px;
+}
+.contact-role-cell {
+  display: flex; flex-direction: column; gap: 2px;
+}
+.contact-role-cell .role { font-size: 12px; color: var(--muted); }
+.contact-role-cell .company-row { display: flex; align-items: center; gap: 6px; }
+.contact-role-cell .company { font-weight: 500; min-width: 0; }
+.contact-name-cell.tbd { color: var(--muted); font-style: italic; }
+
+.company-link {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 18px; height: 18px; border-radius: 4px;
+  background: var(--hair); color: var(--muted);
+  text-decoration: none; font-size: 10px;
+  flex-shrink: 0;
+  transition: all 160ms ease;
+}
+.company-link:hover { background: var(--brand-dark); color: #fff; }
+.company-link-edit {
+  border: 0; background: transparent; color: var(--muted);
+  cursor: pointer; padding: 0 2px; font-size: 10px;
+}
+.company-link-edit:hover { color: var(--ink); }
+
+.drag-handle {
+  cursor: grab; color: var(--hair-2); user-select: none;
+  font-size: 14px; line-height: 1; padding: 4px 2px; text-align: center;
+  transition: color 120ms ease;
+}
+.drag-handle:hover { color: var(--muted); }
+.drag-handle:active { cursor: grabbing; color: var(--ink-2); }
+tr.dragging { opacity: 0.4; }
+tr.drag-over-top    { box-shadow: 0 -2px 0 0 var(--brand-accent) inset, 0 2px 0 0 var(--brand-accent); }
+tr.drag-over-bottom { box-shadow: 0 2px 0 0 var(--brand-accent); }
+tbody.drag-target-empty {
+  outline: 2px dashed var(--brand-accent); outline-offset: -4px;
+}
+
 .cell-due input {
   border: 0; background: transparent; font-family: var(--mono); font-size: 12px;
   color: var(--ink-2); width: 100%; padding: 4px 6px; border-radius: 4px;
@@ -489,30 +538,63 @@ input, select, textarea { font-family: inherit; font-size: inherit; color: inher
     </section>
 
     <section class="view" data-view="outreach">
-      <div class="kpi-toolbar">
-        <p>Product / design leaders to get in front of. Goal: champions who can implement Duble Slash at their station and share with their team.</p>
-        <button class="btn primary" id="btn-contact-new">+ New contact</button>
-      </div>
-      <div class="kpi-table">
-        <table>
-          <thead><tr>
-            <th style="width:160px">Name</th>
-            <th style="width:140px">Company</th>
-            <th style="width:72px">Link</th>
-            <th style="width:120px">Stage</th>
-            <th style="width:90px">Owner</th>
-            <th style="width:56px">Pri</th>
-            <th>Next step</th>
-            <th style="width:130px">Due</th>
-            <th>Notes</th>
-            <th style="width:90px"></th>
-          </tr></thead>
-          <tbody id="contact-tbody"></tbody>
-        </table>
-      </div>
-      <p style="color:var(--muted);font-size:12px;margin-top:16px">
-        Stages: Research → Reached out → Replied → Met → Demoed → Champion. Use <strong>+ task</strong> on a row to create a linked marketing task on the Board.
+      <p style="color:var(--muted);font-size:13px;margin:0 0 20px">
+        Goal: champions who can implement Duble Slash at their station and share with their team. Stages: Research → Reached out → Replied → Met → Demoed → Champion. Use <strong>+ task</strong> on a row to create a linked marketing task on the Board.
       </p>
+
+      <div class="outreach-section">
+        <div class="outreach-section-header">
+          <h3>In-house design leaders</h3>
+          <span class="outreach-count" id="contact-count-company">0</span>
+          <div class="spacer"></div>
+          <button class="btn primary" data-new-contact="company">+ New leader</button>
+        </div>
+        <div class="kpi-table">
+          <table>
+            <thead><tr>
+              <th style="width:24px"></th>
+              <th style="width:180px">Name</th>
+              <th style="width:190px">Role · Company</th>
+              <th style="width:72px">Link</th>
+              <th style="width:120px">Stage</th>
+              <th style="width:90px">Owner</th>
+              <th style="width:56px">Pri</th>
+              <th>Next step</th>
+              <th style="width:130px">Due</th>
+              <th>Notes</th>
+              <th style="width:96px"></th>
+            </tr></thead>
+            <tbody id="contact-tbody-company"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="outreach-section">
+        <div class="outreach-section-header">
+          <h3>Design studios</h3>
+          <span class="outreach-count" id="contact-count-studio">0</span>
+          <div class="spacer"></div>
+          <button class="btn primary" data-new-contact="studio">+ New studio</button>
+        </div>
+        <div class="kpi-table">
+          <table>
+            <thead><tr>
+              <th style="width:24px"></th>
+              <th style="width:180px">Name</th>
+              <th style="width:190px">Role · Studio</th>
+              <th style="width:72px">Link</th>
+              <th style="width:120px">Stage</th>
+              <th style="width:90px">Owner</th>
+              <th style="width:56px">Pri</th>
+              <th>Next step</th>
+              <th style="width:130px">Due</th>
+              <th>Notes</th>
+              <th style="width:96px"></th>
+            </tr></thead>
+            <tbody id="contact-tbody-studio"></tbody>
+          </table>
+        </div>
+      </div>
     </section>
 
     <section class="view" data-view="kpis">
@@ -853,13 +935,16 @@ async function updateContact(id, patch) {
   const { error } = await supabase.from('outreach_contacts').update(patch).eq('id', id);
   if (error) { toast('Save failed: ' + error.message, true); console.error(error); }
 }
-async function createContact() {
+async function createContact(contactType = 'company') {
   const id = 'c' + Date.now().toString(36);
+  const siblings = state.contacts.filter(c => (c.contact_type || 'company') === contactType);
   const row = {
-    id, name: 'New contact', role: '', company: '', linkedin: '',
+    id, contact_type: contactType,
+    name: contactType === 'studio' ? 'New studio lead' : 'New contact',
+    role: '', company: '', linkedin: '',
     stage_id: 'research', owner_id: currentPersonId || 'tal', priority_id: 'p1',
     next_step: '', next_step_due: null, last_touch: null, notes: '',
-    sort_order: (state.contacts.length + 1) * 10
+    sort_order: (siblings.length + 1) * 10
   };
   state.contacts.push(row);
   renderAll();
@@ -878,6 +963,105 @@ async function deleteContact(id) {
   const { error } = await supabase.from('outreach_contacts').delete().eq('id', id);
   if (error) { toast('Delete failed: ' + error.message, true); console.error(error); }
 }
+/* ------- Outreach drag & drop ---------------------------------- */
+let _dragState = { id: null };
+
+function wireDragEvents(tr, c) {
+  tr.addEventListener('dragstart', e => {
+    _dragState.id = c.id;
+    tr.classList.add('dragging');
+    try { e.dataTransfer.setData('text/plain', c.id); } catch(_) {}
+    e.dataTransfer.effectAllowed = 'move';
+  });
+  tr.addEventListener('dragend', () => {
+    tr.draggable = false;
+    tr.classList.remove('dragging');
+    document.querySelectorAll('.drag-over-top, .drag-over-bottom').forEach(
+      x => x.classList.remove('drag-over-top', 'drag-over-bottom'));
+    document.querySelectorAll('.drag-target-empty').forEach(
+      x => x.classList.remove('drag-target-empty'));
+    _dragState.id = null;
+  });
+  tr.addEventListener('dragover', e => {
+    if (!_dragState.id || _dragState.id === c.id) return;
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    const rect = tr.getBoundingClientRect();
+    const above = (e.clientY - rect.top) < rect.height / 2;
+    tr.classList.toggle('drag-over-top', above);
+    tr.classList.toggle('drag-over-bottom', !above);
+  });
+  tr.addEventListener('dragleave', () => {
+    tr.classList.remove('drag-over-top', 'drag-over-bottom');
+  });
+  tr.addEventListener('drop', e => {
+    if (!_dragState.id || _dragState.id === c.id) return;
+    e.preventDefault();
+    const rect = tr.getBoundingClientRect();
+    const above = (e.clientY - rect.top) < rect.height / 2;
+    handleContactDrop(_dragState.id, c, above);
+  });
+}
+
+function wireTbodyDrop(tbody, contactType) {
+  tbody.addEventListener('dragover', e => {
+    if (!_dragState.id) return;
+    if (tbody.children.length > 0) return;  // rows handle non-empty tbodies
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    tbody.classList.add('drag-target-empty');
+  });
+  tbody.addEventListener('dragleave', () => {
+    tbody.classList.remove('drag-target-empty');
+  });
+  tbody.addEventListener('drop', async e => {
+    if (!_dragState.id) return;
+    if (tbody.children.length > 0) return;
+    e.preventDefault();
+    tbody.classList.remove('drag-target-empty');
+    const draggedId = _dragState.id;
+    _dragState.id = null;
+    const dragged = state.contacts.find(x => x.id === draggedId);
+    if (!dragged) return;
+    const patch = { contact_type: contactType, sort_order: 10 };
+    Object.assign(dragged, patch);
+    renderAll();
+    const { error } = await supabase.from('outreach_contacts').update(patch).eq('id', dragged.id);
+    if (error) { toast('Move failed: ' + error.message, true); console.error(error); }
+  });
+}
+
+async function handleContactDrop(draggedId, targetContact, above) {
+  const dragged = state.contacts.find(x => x.id === draggedId);
+  if (!dragged) return;
+  const newType = targetContact.contact_type || 'company';
+  const oldType = dragged.contact_type || 'company';
+
+  // Build ordered sibling list in the target section, minus the dragged row
+  const siblings = state.contacts
+    .filter(c => (c.contact_type || 'company') === newType && c.id !== dragged.id)
+    .sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0));
+  const targetIdx = siblings.findIndex(c => c.id === targetContact.id);
+  if (targetIdx < 0) return;
+  const insertIdx = above ? targetIdx : targetIdx + 1;
+  siblings.splice(insertIdx, 0, dragged);
+
+  // Renumber sort_order to 10, 20, 30, ...
+  siblings.forEach((c, i) => { c.sort_order = (i + 1) * 10; });
+  if (oldType !== newType) dragged.contact_type = newType;
+  renderAll();
+
+  // Persist: bulk update in parallel
+  const updates = siblings.map(c => {
+    const patch = { sort_order: c.sort_order };
+    if (c.id === dragged.id && oldType !== newType) patch.contact_type = newType;
+    return supabase.from('outreach_contacts').update(patch).eq('id', c.id);
+  });
+  const results = await Promise.all(updates);
+  const fail = results.find(r => r.error);
+  if (fail) { toast('Reorder save failed: ' + fail.error.message, true); console.error(fail.error); }
+}
+
 async function createTaskForContact(contact) {
   const id = nextId('MKT');
   const row = {
@@ -1120,110 +1304,156 @@ function renderWeek() {
   }
 }
 
-function renderOutreach() {
-  const tbody = $('contact-tbody');
-  if (!tbody) return;
-  tbody.innerHTML = '';
-  const contacts = [...state.contacts].sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0));
-  contacts.forEach(c => {
-    const tr = document.createElement('tr');
-    tr.setAttribute('data-contact-id', c.id);
+function renderContactRow(c) {
+  const tr = document.createElement('tr');
+  tr.setAttribute('data-contact-id', c.id);
+  wireDragEvents(tr, c);
 
-    const nameTd = el('td', {}, [el('div', { class: 'contact-name-cell', contenteditable: 'true' }, c.name || '')]);
-    nameTd.firstChild.addEventListener('blur', () => {
-      const v = nameTd.firstChild.textContent.trim();
-      if (v !== (c.name || '')) updateContact(c.id, { name: v });
-    });
-    tr.appendChild(nameTd);
+  const handleCell = el('td', {}, [
+    el('div', { class: 'drag-handle', title: 'Drag to reorder or move between lists' }, '⋮⋮')
+  ]);
+  // Only start a drag when the handle is the mousedown target
+  handleCell.firstChild.addEventListener('mousedown', () => { tr.draggable = true; });
+  handleCell.firstChild.addEventListener('mouseup',   () => { tr.draggable = false; });
+  tr.appendChild(handleCell);
 
-    const companyTd = el('td', {}, [el('div', { contenteditable: 'true' }, c.company || '')]);
-    companyTd.firstChild.addEventListener('blur', () => {
-      const v = companyTd.firstChild.textContent.trim();
-      if (v !== (c.company || '')) updateContact(c.id, { company: v });
-    });
-    tr.appendChild(companyTd);
-
-    const linkWrap = el('div', { style: 'display:inline-flex;gap:4px;align-items:center' });
-    if (c.linkedin) {
-      linkWrap.appendChild(el('a', {
-        class: 'linkedin-icon', href: c.linkedin, target: '_blank',
-        rel: 'noopener noreferrer', title: c.linkedin
-      }, 'in'));
-    }
-    linkWrap.appendChild(el('button', {
-      class: 'contact-linkedin-edit', title: 'Edit LinkedIn URL',
-      onclick: () => {
-        const v = prompt('LinkedIn URL', c.linkedin || '');
-        if (v !== null) updateContact(c.id, { linkedin: v.trim() || null });
-      }
-    }, '✎'));
-    tr.appendChild(el('td', {}, [linkWrap]));
-
-    const stageTd = el('td', {});
-    stageTd.appendChild(renderPillSelect('stage', c.stage_id,
-      state.outreach_stages.map(s => ({ id: s.id, label: s.label })),
-      v => updateContact(c.id, { stage_id: v })));
-    tr.appendChild(stageTd);
-
-    const ownerTd = el('td', {});
-    ownerTd.appendChild(renderPillSelect('owner', c.owner_id,
-      state.people.map(p => ({ id: p.id, label: p.name })),
-      v => updateContact(c.id, { owner_id: v })));
-    tr.appendChild(ownerTd);
-
-    const prioTd = el('td', {});
-    prioTd.appendChild(renderPillSelect('priority', c.priority_id,
-      state.priorities,
-      v => updateContact(c.id, { priority_id: v })));
-    tr.appendChild(prioTd);
-
-    const nextTd = el('td', {}, [el('div', { contenteditable: 'true' }, c.next_step || '')]);
-    nextTd.firstChild.addEventListener('blur', () => {
-      const v = nextTd.firstChild.textContent.trim();
-      if (v !== (c.next_step || '')) updateContact(c.id, { next_step: v });
-    });
-    tr.appendChild(nextTd);
-
-    const dueTd = el('td', { class: 'cell-due ' + dueClass(c.next_step_due) });
-    const dueInp = el('input', { type: 'date', value: c.next_step_due || '' });
-    dueInp.addEventListener('change', () => updateContact(c.id, { next_step_due: dueInp.value || null }));
-    dueTd.appendChild(dueInp);
-    tr.appendChild(dueTd);
-
-    const linkedTasks = state.tasks.filter(t => t.contact_id === c.id);
-    const notesDiv = el('div', { contenteditable: 'true' }, c.notes || '');
-    notesDiv.addEventListener('blur', () => {
-      const v = notesDiv.textContent.trim();
-      if (v !== (c.notes || '')) updateContact(c.id, { notes: v });
-    });
-    const notesTd = el('td', {}, [notesDiv]);
-    if (linkedTasks.length) {
-      const tasksLine = el('div', { class: 'contact-tasks' },
-        linkedTasks.map((t, i) => {
-          const span = el('span', { title: `${t.title} · ${t.status_id}` }, t.id);
-          return i === 0 ? span : el('span', {}, [' · ', span]);
-        }));
-      notesTd.appendChild(tasksLine);
-    }
-    tr.appendChild(notesTd);
-
-    const actionsTd = el('td', { style: 'text-align:center' }, [
-      el('div', { class: 'contact-actions' }, [
-        el('button', {
-          class: 'btn ghost', title: 'Create linked marketing task',
-          style: 'padding:4px 8px;font-size:11px',
-          onclick: () => createTaskForContact(c)
-        }, '+ task'),
-        el('button', {
-          class: 'btn danger-ghost', title: 'Delete contact',
-          onclick: () => deleteContact(c.id)
-        }, '×')
-      ])
-    ]);
-    tr.appendChild(actionsTd);
-
-    tbody.appendChild(tr);
+  const isTbd = (c.name || '').startsWith('TBD');
+  const nameCell = el('div', {
+    class: 'contact-name-cell' + (isTbd ? ' tbd' : ''),
+    contenteditable: 'true'
+  }, c.name || '');
+  nameCell.addEventListener('blur', () => {
+    const v = nameCell.textContent.trim();
+    if (v !== (c.name || '')) updateContact(c.id, { name: v });
   });
+  tr.appendChild(el('td', {}, [nameCell]));
+
+  const roleDiv = el('div', { class: 'role', contenteditable: 'true', title: 'Role' }, c.role || '');
+  roleDiv.addEventListener('blur', () => {
+    const v = roleDiv.textContent.trim();
+    if (v !== (c.role || '')) updateContact(c.id, { role: v });
+  });
+  const companyDiv = el('div', { class: 'company', contenteditable: 'true', title: 'Company / studio' }, c.company || '');
+  companyDiv.addEventListener('blur', () => {
+    const v = companyDiv.textContent.trim();
+    if (v !== (c.company || '')) updateContact(c.id, { company: v });
+  });
+  const companyRow = el('div', { class: 'company-row' }, [companyDiv]);
+  if (c.company_url) {
+    companyRow.appendChild(el('a', {
+      class: 'company-link', href: c.company_url, target: '_blank',
+      rel: 'noopener noreferrer', title: c.company_url
+    }, '↗'));
+  }
+  companyRow.appendChild(el('button', {
+    class: 'company-link-edit', title: 'Edit company website URL',
+    onclick: () => {
+      const v = prompt('Company / studio website URL', c.company_url || '');
+      if (v !== null) updateContact(c.id, { company_url: v.trim() || null });
+    }
+  }, '✎'));
+  tr.appendChild(el('td', {}, [el('div', { class: 'contact-role-cell' }, [roleDiv, companyRow])]));
+
+  const linkWrap = el('div', { style: 'display:inline-flex;gap:4px;align-items:center' });
+  if (c.linkedin) {
+    linkWrap.appendChild(el('a', {
+      class: 'linkedin-icon', href: c.linkedin, target: '_blank',
+      rel: 'noopener noreferrer', title: c.linkedin
+    }, 'in'));
+  }
+  linkWrap.appendChild(el('button', {
+    class: 'contact-linkedin-edit', title: 'Edit LinkedIn URL',
+    onclick: () => {
+      const v = prompt('LinkedIn URL', c.linkedin || '');
+      if (v !== null) updateContact(c.id, { linkedin: v.trim() || null });
+    }
+  }, '✎'));
+  tr.appendChild(el('td', {}, [linkWrap]));
+
+  const stageTd = el('td', {});
+  stageTd.appendChild(renderPillSelect('stage', c.stage_id,
+    state.outreach_stages.map(s => ({ id: s.id, label: s.label })),
+    v => updateContact(c.id, { stage_id: v })));
+  tr.appendChild(stageTd);
+
+  const ownerTd = el('td', {});
+  ownerTd.appendChild(renderPillSelect('owner', c.owner_id,
+    state.people.map(p => ({ id: p.id, label: p.name })),
+    v => updateContact(c.id, { owner_id: v })));
+  tr.appendChild(ownerTd);
+
+  const prioTd = el('td', {});
+  prioTd.appendChild(renderPillSelect('priority', c.priority_id,
+    state.priorities,
+    v => updateContact(c.id, { priority_id: v })));
+  tr.appendChild(prioTd);
+
+  const nextDiv = el('div', { contenteditable: 'true' }, c.next_step || '');
+  nextDiv.addEventListener('blur', () => {
+    const v = nextDiv.textContent.trim();
+    if (v !== (c.next_step || '')) updateContact(c.id, { next_step: v });
+  });
+  tr.appendChild(el('td', {}, [nextDiv]));
+
+  const dueTd = el('td', { class: 'cell-due ' + dueClass(c.next_step_due) });
+  const dueInp = el('input', { type: 'date', value: c.next_step_due || '' });
+  dueInp.addEventListener('change', () => updateContact(c.id, { next_step_due: dueInp.value || null }));
+  dueTd.appendChild(dueInp);
+  tr.appendChild(dueTd);
+
+  const linkedTasks = state.tasks.filter(t => t.contact_id === c.id);
+  const notesDiv = el('div', { contenteditable: 'true' }, c.notes || '');
+  notesDiv.addEventListener('blur', () => {
+    const v = notesDiv.textContent.trim();
+    if (v !== (c.notes || '')) updateContact(c.id, { notes: v });
+  });
+  const notesTd = el('td', {}, [notesDiv]);
+  if (linkedTasks.length) {
+    const tasksLine = el('div', { class: 'contact-tasks' },
+      linkedTasks.map((t, i) => {
+        const span = el('span', { title: `${t.title} · ${t.status_id}` }, t.id);
+        return i === 0 ? span : el('span', {}, [' · ', span]);
+      }));
+    notesTd.appendChild(tasksLine);
+  }
+  tr.appendChild(notesTd);
+
+  const actionsTd = el('td', { style: 'text-align:center' }, [
+    el('div', { class: 'contact-actions' }, [
+      el('button', {
+        class: 'btn ghost', title: 'Create linked marketing task',
+        style: 'padding:4px 8px;font-size:11px',
+        onclick: () => createTaskForContact(c)
+      }, '+ task'),
+      el('button', {
+        class: 'btn danger-ghost', title: 'Delete contact',
+        onclick: () => deleteContact(c.id)
+      }, '×')
+    ])
+  ]);
+  tr.appendChild(actionsTd);
+
+  return tr;
+}
+
+function renderOutreach() {
+  const companyBody = $('contact-tbody-company');
+  const studioBody  = $('contact-tbody-studio');
+  if (!companyBody || !studioBody) return;
+  if (!companyBody._dropWired) { wireTbodyDrop(companyBody, 'company'); companyBody._dropWired = true; }
+  if (!studioBody._dropWired)  { wireTbodyDrop(studioBody,  'studio');  studioBody._dropWired  = true; }
+  companyBody.innerHTML = '';
+  studioBody.innerHTML  = '';
+  const contacts = [...state.contacts].sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0));
+  let nCompany = 0, nStudio = 0;
+  contacts.forEach(c => {
+    const type = c.contact_type || 'company';
+    const tr = renderContactRow(c);
+    if (type === 'studio') { studioBody.appendChild(tr); nStudio++; }
+    else                   { companyBody.appendChild(tr); nCompany++; }
+  });
+  const cc = $('contact-count-company'); if (cc) cc.textContent = nCompany;
+  const cs = $('contact-count-studio');  if (cs) cs.textContent = nStudio;
 }
 
 function renderRepo() {
@@ -1293,7 +1523,9 @@ document.querySelectorAll('[data-filter-priority]').forEach(b => {
 
 $('btn-new').addEventListener('click', () => createTask(state.groups[0]?.id || 'marketing'));
 $('btn-kpi-new').addEventListener('click', createKpi);
-$('btn-contact-new').addEventListener('click', createContact);
+document.querySelectorAll('[data-new-contact]').forEach(b => {
+  b.addEventListener('click', () => createContact(b.dataset.newContact));
+});
 $('btn-signout').addEventListener('click', signOut);
 $('btn-signout-gate').addEventListener('click', signOut);
 
