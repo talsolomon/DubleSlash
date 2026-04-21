@@ -14,21 +14,22 @@ type: methodology-index
 
 ```
 _bmad/methodology/
+├── agents-overview.md              ← START HERE · all 13 agents in one map
 ├── fish/                           ← the methodology itself
 │   ├── README.md                   overview, axes, archetypes, phases
 │   ├── phases-and-methods.md       deep dive on the four phases + method catalog
 │   ├── human-ai-collaboration.md   the moat — how FISH makes AI usable for designers
 │   ├── use-cases.md                four worked scenarios (one per archetype)
 │   └── transitions-and-handoffs.md gates, `<FISH-handoff>`, reverse flow
-├── local-agents/                   ← personas the user invokes via `//`
-│   ├── README.md                   roster + universal contract
-│   ├── explorer.md                 phase 1 (head)
-│   ├── solidifier.md               phase 2 (left body)
-│   ├── builder.md                  phase 3 (right body)
-│   └── shipper.md                  phase 4 (tail)
-└── system-agents/                  ← background workers in Context Cloud
-    └── README.md                   capture, redaction, sync, handoff, context bundler,
-                                     digest, personal twin, flow-checker, process
+├── local-agents/                   ← 4 personas the user invokes via `//`
+│   ├── README.md                   roster + universal contract + capability codes
+│   ├── explorer.md                 phase 1 · head · Nova
+│   ├── solidifier.md               phase 2 · left body · Sol
+│   ├── builder.md                  phase 3 · right body · Bram
+│   └── shipper.md                  phase 4 · tail · Sage
+└── system-agents/                  ← 9 background workers in Context Cloud
+    └── README.md                   Tally · Cipher · Relay · Beacon · Pack ·
+                                     Echo · Twin · Gate · Loom
 ```
 
 ---
@@ -47,6 +48,7 @@ _bmad/methodology/
 
 ## How to read this folder
 
+- **Which agent do I reach for / who are all these agents?** → [`agents-overview.md`](./agents-overview.md). The single-file roster + hierarchy + task-lookup.
 - **New to Duble Slash / FISH:** start at [`fish/README.md`](./fish/README.md).
 - **"Why should I care as a designer using AI?":** [`fish/human-ai-collaboration.md`](./fish/human-ai-collaboration.md). This is the 5-minute pitch.
 - **"What do I actually *do* in each phase?":** [`fish/phases-and-methods.md`](./fish/phases-and-methods.md).
