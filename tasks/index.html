@@ -270,6 +270,37 @@ input, select, textarea { font-family: inherit; font-size: inherit; color: inher
 .pill-priority[data-value="p1"] { background: var(--warn); color: #fff; }
 .pill-priority[data-value="p2"] { background: var(--hair); color: var(--muted); }
 
+.pill-stage { text-align: center; font-weight: 500; }
+.pill-stage[data-value="research"]    { background: var(--hair); color: var(--muted); }
+.pill-stage[data-value="reached_out"] { background: #fde2c4; color: #7a4a10; }
+.pill-stage[data-value="replied"]     { background: #c8f0e4; color: #0e5146; }
+.pill-stage[data-value="met"]         { background: #e4def5; color: #3a3470; }
+.pill-stage[data-value="demoed"]      { background: var(--brand-dark); color: #fff; }
+.pill-stage[data-value="champion"]    { background: var(--good); color: #fff; }
+.pill-stage[data-value="passed"]      { background: var(--hair-2); color: var(--muted); }
+.pill-stage[data-value="dormant"]     { background: #c4c2bb; color: var(--ink-2); }
+
+.linkedin-icon {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 22px; height: 22px; border-radius: 5px;
+  background: var(--hair); color: var(--ink-2);
+  text-decoration: none; font-size: 11px; font-weight: 700;
+  transition: all 160ms ease;
+}
+.linkedin-icon:hover { background: #0a66c2; color: #fff; }
+.contact-linkedin-edit {
+  border: 0; background: transparent; color: var(--muted);
+  cursor: pointer; padding: 2px 4px; font-size: 11px;
+}
+.contact-linkedin-edit:hover { color: var(--ink); }
+.contact-tasks {
+  font-family: var(--mono); font-size: 11px;
+  color: var(--muted); margin-top: 4px;
+}
+.contact-tasks a { color: var(--muted); text-decoration: none; }
+.contact-tasks a:hover { color: var(--ink); }
+.contact-actions { display: inline-flex; gap: 2px; align-items: center; }
+
 .cell-due input {
   border: 0; background: transparent; font-family: var(--mono); font-size: 12px;
   color: var(--ink-2); width: 100%; padding: 4px 6px; border-radius: 4px;
@@ -416,6 +447,7 @@ input, select, textarea { font-family: inherit; font-size: inherit; color: inher
       <div class="tabs" id="tabs">
         <button class="tab active" data-view="board">Board</button>
         <button class="tab" data-view="week">My Week</button>
+        <button class="tab" data-view="outreach">Outreach</button>
         <button class="tab" data-view="kpis">KPIs</button>
       </div>
       <div class="spacer"></div>
@@ -454,6 +486,33 @@ input, select, textarea { font-family: inherit; font-size: inherit; color: inher
         <div class="week-stat"><div class="week-stat-num" id="week-blocked">0</div><div class="week-stat-label">Blocked</div></div>
       </div>
       <div class="board" id="week-board"></div>
+    </section>
+
+    <section class="view" data-view="outreach">
+      <div class="kpi-toolbar">
+        <p>Product / design leaders to get in front of. Goal: champions who can implement Duble Slash at their station and share with their team.</p>
+        <button class="btn primary" id="btn-contact-new">+ New contact</button>
+      </div>
+      <div class="kpi-table">
+        <table>
+          <thead><tr>
+            <th style="width:160px">Name</th>
+            <th style="width:140px">Company</th>
+            <th style="width:72px">Link</th>
+            <th style="width:120px">Stage</th>
+            <th style="width:90px">Owner</th>
+            <th style="width:56px">Pri</th>
+            <th>Next step</th>
+            <th style="width:130px">Due</th>
+            <th>Notes</th>
+            <th style="width:90px"></th>
+          </tr></thead>
+          <tbody id="contact-tbody"></tbody>
+        </table>
+      </div>
+      <p style="color:var(--muted);font-size:12px;margin-top:16px">
+        Stages: Research → Reached out → Replied → Met → Demoed → Champion. Use <strong>+ task</strong> on a row to create a linked marketing task on the Board.
+      </p>
     </section>
 
     <section class="view" data-view="kpis">
@@ -500,7 +559,8 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
    ========================================================================= */
 let state = {
   groups: [], people: [], statuses: [], priorities: [],
-  tasks: [], kpis: [], commits: []
+  tasks: [], kpis: [], commits: [],
+  contacts: [], outreach_stages: []
 };
 let filters = { search: "", owner: "", status: "", priority: "" };
 let currentUser = null;
@@ -658,28 +718,32 @@ async function signOut() {
    Data loaders
    ========================================================================= */
 async function loadAll() {
-  const [groups, people, statuses, priorities, tasks, kpis, commits] = await Promise.all([
+  const [groups, people, statuses, priorities, tasks, kpis, commits, contacts, outreachStages] = await Promise.all([
     supabase.from('groups').select('*').order('sort_order'),
     supabase.from('people').select('*').order('name'),
     supabase.from('statuses').select('*').order('sort_order'),
     supabase.from('priorities').select('*').order('sort_order'),
     supabase.from('tasks').select('*').order('sort_order'),
     supabase.from('kpis').select('*').order('sort_order'),
-    supabase.from('repo_commits').select('*').order('seen_at', { ascending: false })
+    supabase.from('repo_commits').select('*').order('seen_at', { ascending: false }),
+    supabase.from('outreach_contacts').select('*').order('sort_order'),
+    supabase.from('outreach_stages').select('*').order('sort_order')
   ]);
-  const fail = [groups, people, statuses, priorities, tasks, kpis, commits].find(r => r.error);
+  const fail = [groups, people, statuses, priorities, tasks, kpis, commits, contacts, outreachStages].find(r => r.error);
   if (fail) {
     toast('Load error: ' + fail.error.message, true);
     console.error(fail.error);
     return;
   }
-  state.groups     = groups.data;
-  state.people     = people.data;
-  state.statuses   = statuses.data;
-  state.priorities = priorities.data;
-  state.tasks      = tasks.data;
-  state.kpis       = kpis.data;
-  state.commits    = commits.data;
+  state.groups          = groups.data;
+  state.people          = people.data;
+  state.statuses        = statuses.data;
+  state.priorities      = priorities.data;
+  state.tasks           = tasks.data;
+  state.kpis            = kpis.data;
+  state.commits         = commits.data;
+  state.contacts        = contacts.data;
+  state.outreach_stages = outreachStages.data;
   renderAll();
 }
 
@@ -688,7 +752,7 @@ async function loadAll() {
    ========================================================================= */
 function subscribeRealtime() {
   const channel = supabase.channel('dslash-board');
-  const tables = ['tasks', 'kpis', 'groups', 'people', 'statuses', 'priorities', 'repo_commits'];
+  const tables = ['tasks', 'kpis', 'groups', 'people', 'statuses', 'priorities', 'repo_commits', 'outreach_contacts', 'outreach_stages'];
   tables.forEach(t => {
     channel.on('postgres_changes', { event: '*', schema: 'public', table: t }, (payload) => {
       applyChange(t, payload);
@@ -702,7 +766,9 @@ function applyChange(table, payload) {
   const key = {
     tasks: 'tasks', kpis: 'kpis', groups: 'groups',
     people: 'people', statuses: 'statuses', priorities: 'priorities',
-    repo_commits: 'commits'
+    repo_commits: 'commits',
+    outreach_contacts: 'contacts',
+    outreach_stages: 'outreach_stages'
   }[table];
   if (!key) return;
   if (eventType === 'INSERT') {
@@ -779,6 +845,59 @@ async function deleteKpi(id) {
   renderAll();
   const { error } = await supabase.from('kpis').delete().eq('id', id);
   if (error) { toast('Delete failed: ' + error.message, true); console.error(error); }
+}
+
+async function updateContact(id, patch) {
+  const idx = state.contacts.findIndex(c => c.id === id);
+  if (idx >= 0) Object.assign(state.contacts[idx], patch);
+  const { error } = await supabase.from('outreach_contacts').update(patch).eq('id', id);
+  if (error) { toast('Save failed: ' + error.message, true); console.error(error); }
+}
+async function createContact() {
+  const id = 'c' + Date.now().toString(36);
+  const row = {
+    id, name: 'New contact', role: '', company: '', linkedin: '',
+    stage_id: 'research', owner_id: currentPersonId || 'tal', priority_id: 'p1',
+    next_step: '', next_step_due: null, last_touch: null, notes: '',
+    sort_order: (state.contacts.length + 1) * 10
+  };
+  state.contacts.push(row);
+  renderAll();
+  const { error } = await supabase.from('outreach_contacts').insert(row);
+  if (error) { toast('Create failed: ' + error.message, true); console.error(error); return; }
+  setTimeout(() => {
+    const nameEl = document.querySelector(`tr[data-contact-id="${id}"] .contact-name-cell`);
+    if (nameEl) { nameEl.focus(); document.getSelection().selectAllChildren(nameEl); }
+  }, 60);
+}
+async function deleteContact(id) {
+  const c = state.contacts.find(x => x.id === id);
+  if (!confirm(`Delete contact "${c?.name || id}"?`)) return;
+  state.contacts = state.contacts.filter(x => x.id !== id);
+  renderAll();
+  const { error } = await supabase.from('outreach_contacts').delete().eq('id', id);
+  if (error) { toast('Delete failed: ' + error.message, true); console.error(error); }
+}
+async function createTaskForContact(contact) {
+  const id = nextId('MKT');
+  const row = {
+    id,
+    title: `Follow up with ${contact.name}`,
+    group_id: 'marketing',
+    owner_id: currentPersonId || contact.owner_id || 'tal',
+    status_id: 'todo',
+    priority_id: contact.priority_id || 'p1',
+    due: contact.next_step_due || null,
+    notes: contact.next_step || '',
+    github: '',
+    contact_id: contact.id,
+    sort_order: (state.tasks.filter(t => t.group_id === 'marketing').length + 1) * 10
+  };
+  state.tasks.push(row);
+  renderAll();
+  const { error } = await supabase.from('tasks').insert(row);
+  if (error) { toast('Create failed: ' + error.message, true); console.error(error); return; }
+  toast(`Linked task ${id} created`);
 }
 
 /* =========================================================================
@@ -1001,6 +1120,112 @@ function renderWeek() {
   }
 }
 
+function renderOutreach() {
+  const tbody = $('contact-tbody');
+  if (!tbody) return;
+  tbody.innerHTML = '';
+  const contacts = [...state.contacts].sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0));
+  contacts.forEach(c => {
+    const tr = document.createElement('tr');
+    tr.setAttribute('data-contact-id', c.id);
+
+    const nameTd = el('td', {}, [el('div', { class: 'contact-name-cell', contenteditable: 'true' }, c.name || '')]);
+    nameTd.firstChild.addEventListener('blur', () => {
+      const v = nameTd.firstChild.textContent.trim();
+      if (v !== (c.name || '')) updateContact(c.id, { name: v });
+    });
+    tr.appendChild(nameTd);
+
+    const companyTd = el('td', {}, [el('div', { contenteditable: 'true' }, c.company || '')]);
+    companyTd.firstChild.addEventListener('blur', () => {
+      const v = companyTd.firstChild.textContent.trim();
+      if (v !== (c.company || '')) updateContact(c.id, { company: v });
+    });
+    tr.appendChild(companyTd);
+
+    const linkWrap = el('div', { style: 'display:inline-flex;gap:4px;align-items:center' });
+    if (c.linkedin) {
+      linkWrap.appendChild(el('a', {
+        class: 'linkedin-icon', href: c.linkedin, target: '_blank',
+        rel: 'noopener noreferrer', title: c.linkedin
+      }, 'in'));
+    }
+    linkWrap.appendChild(el('button', {
+      class: 'contact-linkedin-edit', title: 'Edit LinkedIn URL',
+      onclick: () => {
+        const v = prompt('LinkedIn URL', c.linkedin || '');
+        if (v !== null) updateContact(c.id, { linkedin: v.trim() || null });
+      }
+    }, '✎'));
+    tr.appendChild(el('td', {}, [linkWrap]));
+
+    const stageTd = el('td', {});
+    stageTd.appendChild(renderPillSelect('stage', c.stage_id,
+      state.outreach_stages.map(s => ({ id: s.id, label: s.label })),
+      v => updateContact(c.id, { stage_id: v })));
+    tr.appendChild(stageTd);
+
+    const ownerTd = el('td', {});
+    ownerTd.appendChild(renderPillSelect('owner', c.owner_id,
+      state.people.map(p => ({ id: p.id, label: p.name })),
+      v => updateContact(c.id, { owner_id: v })));
+    tr.appendChild(ownerTd);
+
+    const prioTd = el('td', {});
+    prioTd.appendChild(renderPillSelect('priority', c.priority_id,
+      state.priorities,
+      v => updateContact(c.id, { priority_id: v })));
+    tr.appendChild(prioTd);
+
+    const nextTd = el('td', {}, [el('div', { contenteditable: 'true' }, c.next_step || '')]);
+    nextTd.firstChild.addEventListener('blur', () => {
+      const v = nextTd.firstChild.textContent.trim();
+      if (v !== (c.next_step || '')) updateContact(c.id, { next_step: v });
+    });
+    tr.appendChild(nextTd);
+
+    const dueTd = el('td', { class: 'cell-due ' + dueClass(c.next_step_due) });
+    const dueInp = el('input', { type: 'date', value: c.next_step_due || '' });
+    dueInp.addEventListener('change', () => updateContact(c.id, { next_step_due: dueInp.value || null }));
+    dueTd.appendChild(dueInp);
+    tr.appendChild(dueTd);
+
+    const linkedTasks = state.tasks.filter(t => t.contact_id === c.id);
+    const notesDiv = el('div', { contenteditable: 'true' }, c.notes || '');
+    notesDiv.addEventListener('blur', () => {
+      const v = notesDiv.textContent.trim();
+      if (v !== (c.notes || '')) updateContact(c.id, { notes: v });
+    });
+    const notesTd = el('td', {}, [notesDiv]);
+    if (linkedTasks.length) {
+      const tasksLine = el('div', { class: 'contact-tasks' },
+        linkedTasks.map((t, i) => {
+          const span = el('span', { title: `${t.title} · ${t.status_id}` }, t.id);
+          return i === 0 ? span : el('span', {}, [' · ', span]);
+        }));
+      notesTd.appendChild(tasksLine);
+    }
+    tr.appendChild(notesTd);
+
+    const actionsTd = el('td', { style: 'text-align:center' }, [
+      el('div', { class: 'contact-actions' }, [
+        el('button', {
+          class: 'btn ghost', title: 'Create linked marketing task',
+          style: 'padding:4px 8px;font-size:11px',
+          onclick: () => createTaskForContact(c)
+        }, '+ task'),
+        el('button', {
+          class: 'btn danger-ghost', title: 'Delete contact',
+          onclick: () => deleteContact(c.id)
+        }, '×')
+      ])
+    ]);
+    tr.appendChild(actionsTd);
+
+    tbody.appendChild(tr);
+  });
+}
+
 function renderRepo() {
   const panel = $('repo-panel');
   panel.innerHTML = '';
@@ -1028,6 +1253,7 @@ function renderAll() {
   renderKpiStrip();
   renderKpiTable();
   renderWeek();
+  renderOutreach();
   renderRepo();
 }
 
@@ -1067,6 +1293,7 @@ document.querySelectorAll('[data-filter-priority]').forEach(b => {
 
 $('btn-new').addEventListener('click', () => createTask(state.groups[0]?.id || 'marketing'));
 $('btn-kpi-new').addEventListener('click', createKpi);
+$('btn-contact-new').addEventListener('click', createContact);
 $('btn-signout').addEventListener('click', signOut);
 $('btn-signout-gate').addEventListener('click', signOut);
 
