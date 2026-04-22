@@ -700,14 +700,12 @@ tbody.drag-target-empty {
         <button class="btn ghost" id="iv-back">← Back to list</button>
         <div id="iv-header" class="iv-header"></div>
         <div class="spacer"></div>
-        <button class="btn ghost" id="iv-copy-md" title="Copy formatted markdown to clipboard">📋 Copy</button>
-        <button class="btn primary" id="iv-sync-git" title="Commit this interview as markdown to the repo">🔄 Sync to git</button>
+        <button class="btn ghost" id="iv-copy-md" title="Copy formatted markdown to clipboard">📋 Copy as markdown</button>
       </div>
       <div id="iv-sections" class="iv-sections"></div>
       <div class="iv-footer">
         <p style="color:var(--muted);font-size:12px;margin:0">
-          Responses save on blur. <strong>Sync to git</strong> writes
-          <code>_bmad/planning-artifacts/research/interviews/&lt;slug&gt;.md</code> to <code>main</code> — Claude can read it after <code>git pull</code>.
+          Responses save on blur.
         </p>
       </div>
     </section>
@@ -1880,12 +1878,6 @@ function renderInterviewDetail() {
   const host = $('iv-sections');
   const readonly = state.interview_mode === 'preview';
 
-  // Toggle the mode-dependent toolbar buttons
-  const copyBtn = $('iv-copy-md');
-  const syncBtn = $('iv-sync-git');
-  if (copyBtn) copyBtn.style.display = '';
-  if (syncBtn) syncBtn.style.display = readonly ? 'none' : '';
-
   if (!interview) {
     header.innerHTML = '<em>No interview selected.</em>';
     host.innerHTML = '';
@@ -2111,36 +2103,6 @@ async function copyInterviewMarkdown() {
   }
 }
 
-async function syncInterviewToGit() {
-  if (!state.current_interview_id) return;
-  const btn = $('iv-sync-git');
-  const orig = btn.textContent;
-  btn.disabled = true;
-  btn.textContent = '🔄 Syncing…';
-  try {
-    const { data: { session }, error: sessErr } = await supabase.auth.getSession();
-    if (sessErr || !session) throw new Error('Not signed in');
-    const res = await fetch('/api/sync-interview', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${session.access_token}`
-      },
-      body: JSON.stringify({ interviewId: state.current_interview_id })
-    });
-    const data = await res.json().catch(() => ({}));
-    if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
-    toast(`Synced → ${data.path} (${data.action})`);
-    if (data.htmlUrl) window.open(data.htmlUrl, '_blank');
-  } catch (e) {
-    toast('Sync failed: ' + e.message, true);
-    console.error(e);
-  } finally {
-    btn.disabled = false;
-    btn.textContent = orig;
-  }
-}
-
 function renderRepo() {
   const panel = $('repo-panel');
   panel.innerHTML = '';
@@ -2218,7 +2180,6 @@ $('btn-signout').addEventListener('click', signOut);
 $('btn-signout-gate').addEventListener('click', signOut);
 $('iv-back').addEventListener('click', closeInterview);
 $('iv-copy-md').addEventListener('click', copyInterviewMarkdown);
-$('iv-sync-git').addEventListener('click', syncInterviewToGit);
 
 $('gate-form').addEventListener('submit', e => {
   e.preventDefault();
