@@ -6,7 +6,17 @@
 <title>Duble Slash — Task Board</title>
 <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 <link rel="apple-touch-icon" href="/favicon.svg" />
-<meta name="theme-color" content="#0e3a35" />
+<meta name="theme-color" content="#0e3a35" id="theme-color-meta" />
+<script>
+/* Apply theme before first paint to avoid FOUC. */
+(function(){
+  try {
+    var saved = localStorage.getItem('duble-slash-theme');
+    var theme = saved || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    document.documentElement.dataset.theme = theme;
+  } catch (e) {}
+})();
+</script>
 <style>
 :root {
   --bg: #f6f5f1;
@@ -16,6 +26,9 @@
   --hair: #e6e3db;
   --hair-2: #d8d4c8;
   --card: #ffffff;
+  --surface-2: #fafaf6;
+  --dot: rgba(15,17,21,0.05);
+  --header-bg: rgba(246, 245, 241, 0.9);
   --accent: #d98a2b;
   --brand-dark: #0e3a35;
   --brand-accent: #3dd9b6;
@@ -28,13 +41,30 @@
   --shadow-sm: 0 1px 2px rgba(15,17,21,0.04), 0 1px 3px rgba(15,17,21,0.06);
   --shadow-md: 0 6px 16px rgba(15,17,21,0.08), 0 2px 4px rgba(15,17,21,0.04);
   --shadow-lg: 0 20px 50px rgba(15,17,21,0.12), 0 4px 10px rgba(15,17,21,0.06);
+  color-scheme: light;
+}
+[data-theme="dark"] {
+  --bg: #0f1012;
+  --ink: #ece9e0;
+  --ink-2: #c6c3bb;
+  --muted: #8c8e95;
+  --hair: #262833;
+  --hair-2: #363944;
+  --card: #181a20;
+  --surface-2: #1f2128;
+  --dot: rgba(255,255,255,0.04);
+  --header-bg: rgba(15, 16, 18, 0.85);
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.4), 0 1px 3px rgba(0,0,0,0.35);
+  --shadow-md: 0 6px 16px rgba(0,0,0,0.45), 0 2px 4px rgba(0,0,0,0.3);
+  --shadow-lg: 0 20px 50px rgba(0,0,0,0.55), 0 4px 10px rgba(0,0,0,0.4);
+  color-scheme: dark;
 }
 * { box-sizing: border-box; }
 html, body { margin: 0; padding: 0; min-height: 100%; }
 body {
   font-family: var(--font); color: var(--ink);
   background: var(--bg);
-  background-image: radial-gradient(circle at center, rgba(15,17,21,0.05) 1px, transparent 1.2px);
+  background-image: radial-gradient(circle at center, var(--dot) 1px, transparent 1.2px);
   background-size: 22px 22px;
   font-size: 14px; line-height: 1.45;
 }
@@ -67,7 +97,7 @@ input, select, textarea { font-family: inherit; font-size: inherit; color: inher
 .gate-hint { font-size: 12px; color: var(--muted); margin-top: -2px; }
 .gate-msg {
   margin-top: 14px; padding: 10px 12px; border-radius: 8px;
-  font-size: 13px; background: #fafaf6;
+  font-size: 13px; background: var(--surface-2);
   border: 1px solid var(--hair);
 }
 .gate-msg.ok { background: #e8f6f2; border-color: #c3ead8; color: #0e5146; }
@@ -76,7 +106,7 @@ input, select, textarea { font-family: inherit; font-size: inherit; color: inher
 /* ===== Header ===== */
 .app-header {
   position: sticky; top: 0; z-index: 50;
-  background: rgba(246, 245, 241, 0.9);
+  background: var(--header-bg);
   backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--hair);
   padding: 14px 24px;
@@ -179,7 +209,7 @@ input, select, textarea { font-family: inherit; font-size: inherit; color: inher
 .group-header {
   display: flex; align-items: center; gap: 10px; padding: 12px 16px;
   border-bottom: 1px solid var(--hair); cursor: pointer;
-  background: #fafaf6;
+  background: var(--surface-2);
 }
 .group-caret { transition: transform 180ms ease; color: var(--muted); font-size: 11px; }
 .group.collapsed .group-caret { transform: rotate(-90deg); }
@@ -206,7 +236,7 @@ input, select, textarea { font-family: inherit; font-size: inherit; color: inher
   transition: background 120ms ease;
 }
 .row:last-child { border-bottom: 0; }
-.row:hover { background: #fafaf6; }
+.row:hover { background: var(--surface-2); }
 .row.done .cell-title { text-decoration: line-through; color: var(--muted); }
 .row-head {
   font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted);
@@ -418,7 +448,7 @@ tbody.drag-target-empty {
   min-height: 40px; background: var(--bg); font-family: inherit;
   resize: vertical;
 }
-.iv-response:focus { outline: 2px solid var(--brand-accent); outline-offset: -1px; background: #fff; }
+.iv-response:focus { outline: 2px solid var(--brand-accent); outline-offset: -1px; background: var(--card); }
 .iv-sidemeta { display: flex; flex-direction: column; gap: 6px; }
 .iv-quote-input {
   font-size: 12px; padding: 6px 8px; border: 1px solid var(--hair);
@@ -532,7 +562,7 @@ tbody.drag-target-empty {
 }
 .kpi-table table { width: 100%; border-collapse: collapse; }
 .kpi-table th {
-  text-align: left; padding: 12px 16px; background: #fafaf6;
+  text-align: left; padding: 12px 16px; background: var(--surface-2);
   font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted);
   border-bottom: 1px solid var(--hair);
 }
@@ -608,6 +638,7 @@ tbody.drag-target-empty {
       <span class="user-chip" id="user-chip"></span>
       <div class="actions">
         <button class="btn primary" id="btn-new">+ New task</button>
+        <button class="btn ghost" id="btn-theme" title="Toggle theme" aria-label="Toggle theme">☾</button>
         <button class="btn ghost" id="btn-signout" title="Sign out">⎋</button>
       </div>
     </div>
@@ -2178,6 +2209,20 @@ document.querySelectorAll('[data-new-contact]').forEach(b => {
 });
 $('btn-signout').addEventListener('click', signOut);
 $('btn-signout-gate').addEventListener('click', signOut);
+
+/* ===== Theme toggle ===== */
+function applyTheme(theme) {
+  document.documentElement.dataset.theme = theme;
+  try { localStorage.setItem('duble-slash-theme', theme); } catch (e) {}
+  const meta = $('theme-color-meta');
+  if (meta) meta.setAttribute('content', theme === 'dark' ? '#0f1012' : '#0e3a35');
+  const btn = $('btn-theme');
+  if (btn) btn.textContent = theme === 'dark' ? '☀' : '☾';
+}
+applyTheme(document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light');
+$('btn-theme').addEventListener('click', () => {
+  applyTheme(document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark');
+});
 $('iv-back').addEventListener('click', closeInterview);
 $('iv-copy-md').addEventListener('click', copyInterviewMarkdown);
 
