@@ -1,5 +1,10 @@
 .DS_Store
 **/.DS_Store
 
+# Python virtualenvs
+**/.tts-venv/
+**/.venv/
+**/venv/
+
 # Supabase — local dev credentials (founder passwords). Do not commit.
 supabase/bootstrap-users.sql
