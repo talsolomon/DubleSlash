@@ -2,13 +2,18 @@ name: Sync repo commits
 
 # Inserts every push to main into public.repo_commits so the REPO ACTIVITY
 # widget on the task board stays live without anyone writing a migration by
-# hand. Uses the already-configured SUPABASE_DB_PASSWORD + SUPABASE_PROJECT_ID
-# secrets that the supabase-migrate workflow uses.
+# hand.
 #
-# Handles multi-commit pushes by replaying every sha between the previous
-# ref and HEAD (falls back to just HEAD on initial/force push where `before`
-# is all-zeros). Idempotent — repeated runs are no-ops thanks to the
-# `on conflict (sha) do nothing` clause.
+# Uses the Supabase Management API (POST /v1/projects/{ref}/database/query)
+# rather than a direct DB connection, because GitHub Actions runners only
+# have IPv4 and Supabase's direct 5432 endpoint is IPv6-only now. The API
+# path goes over plain HTTPS and reuses the existing SUPABASE_ACCESS_TOKEN
+# secret — no new secrets, no pooler region to hard-code.
+#
+# Handles multi-commit pushes by iterating every sha between the previous
+# ref and HEAD (falls back to just HEAD on initial/force push where
+# github.event.before is all-zeros). Idempotent — repeated runs are no-ops
+# thanks to the `on conflict (sha) do nothing` clause.
 
 on:
   push:
@@ -25,14 +30,14 @@ jobs:
 
       - name: Insert pushed commits into repo_commits
         env:
-          PGPASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
           SUPABASE_PROJECT_ID: ${{ secrets.SUPABASE_PROJECT_ID }}
           BEFORE_SHA: ${{ github.event.before }}
         run: |
           set -euo pipefail
 
           # On initial push or force-push, github.event.before is 40 zeros.
-          # In that case, only sync HEAD — backfills live in migration files.
+          # In that case, only sync HEAD — historical commits are in migrations.
           if [[ "${BEFORE_SHA:-}" =~ ^0+$ ]] || [[ -z "${BEFORE_SHA:-}" ]]; then
             RANGE_START="HEAD~1"
           else
@@ -46,15 +51,31 @@ jobs:
             exit 0
           fi
 
-          DB_URL="postgresql://postgres:${PGPASSWORD}@db.${SUPABASE_PROJECT_ID}.supabase.co:5432/postgres?sslmode=require"
+          API_URL="https://api.supabase.com/v1/projects/${SUPABASE_PROJECT_ID}/database/query"
 
           for full in $SHAS; do
             SHA=$(git rev-parse --short=7 "$full")
             MSG=$(git log -1 "$full" --pretty=%s)
             TS=$(git log -1 "$full" --pretty=%aI)
             echo "Inserting: $SHA — $MSG @ $TS"
-            psql "$DB_URL" \
-              -v ON_ERROR_STOP=1 \
-              -v "sha=$SHA" -v "msg=$MSG" -v "ts=$TS" \
-              -c "insert into public.repo_commits (sha, msg, seen_at) values (:'sha', :'msg', :'ts') on conflict (sha) do nothing;"
+
+            # jq -Rn builds a safe JSON body — handles quotes, backslashes,
+            # unicode in the commit message.
+            BODY=$(jq -Rn --arg sha "$SHA" --arg msg "$MSG" --arg ts "$TS" \
+              '{query: ("insert into public.repo_commits (sha, msg, seen_at) values (" +
+                        ($sha | @json) + ", " +
+                        ($msg | @json) + ", " +
+                        ($ts  | @json) + "::timestamptz) on conflict (sha) do nothing;")}')
+
+            HTTP_CODE=$(curl -sS -o /tmp/resp.json -w '%{http_code}' \
+              -X POST "$API_URL" \
+              -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
+              -H "Content-Type: application/json" \
+              -d "$BODY")
+
+            if [[ "$HTTP_CODE" != "200" && "$HTTP_CODE" != "201" ]]; then
+              echo "Management API error ($HTTP_CODE):"
+              cat /tmp/resp.json
+              exit 1
+            fi
           done
