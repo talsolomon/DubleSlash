@@ -201,6 +201,32 @@ input, select, textarea { font-family: inherit; font-size: inherit; color: inher
 
 /* ===== Board view ===== */
 .board { display: flex; flex-direction: column; gap: 12px; }
+
+/* Group tabs (pill bar that switches which group's tasks are visible) */
+.group-tabs {
+  display: flex; flex-wrap: wrap; gap: 6px;
+  margin: 0 0 16px; padding: 0;
+}
+.group-tab {
+  display: inline-flex; align-items: center; gap: 8px;
+  border: 1px solid var(--hair); background: var(--card);
+  color: var(--ink-2); padding: 7px 12px; border-radius: 999px;
+  cursor: pointer; font-weight: 500; font-size: 13px;
+  transition: all 160ms ease;
+}
+.group-tab:hover { border-color: var(--ink-2); color: var(--ink); }
+.group-tab.active {
+  background: var(--ink); color: var(--bg); border-color: var(--ink);
+  box-shadow: var(--shadow-sm);
+}
+.group-tab .group-tab-icon { font-size: 14px; }
+.group-tab .group-tab-count {
+  font-family: var(--mono); font-size: 11px;
+  padding: 1px 7px; border-radius: 999px;
+  background: var(--hair); color: var(--muted);
+}
+.group-tab.active .group-tab-count { background: rgba(255,255,255,0.14); color: var(--bg); }
+
 .group {
   background: var(--card); border: 1px solid var(--hair);
   border-radius: 12px; overflow: hidden;
@@ -655,6 +681,7 @@ tbody.drag-target-empty {
         <button class="filter-chip" data-filter-priority="p0">P0</button>
       </div>
       <div class="kpi-strip" id="board-kpi-strip"></div>
+      <div class="group-tabs" id="group-tabs"></div>
       <div class="board" id="board"></div>
       <div class="repo" id="repo-panel"></div>
     </section>
@@ -793,6 +820,10 @@ let state = {
   interview_mode: 'run'  // 'run' = editable | 'preview' = read-only
 };
 let filters = { search: "", owner: "", status: "", priority: "" };
+let activeGroupId = (() => {
+  try { return localStorage.getItem('duble-slash-active-group') || '__all__'; }
+  catch (e) { return '__all__'; }
+})();
 let currentUser = null;
 let currentPersonId = null;  // maps user email → people.id (used by createTask default owner)
 
@@ -1394,11 +1425,57 @@ function renderGroup(group, tasks) {
   return wrapper;
 }
 
+function setActiveGroup(id) {
+  activeGroupId = id;
+  try { localStorage.setItem('duble-slash-active-group', id); } catch (e) {}
+  renderGroupTabs();
+  renderBoard();
+}
+
+function renderGroupTabs() {
+  const container = $('group-tabs');
+  if (!container) return;
+  container.innerHTML = '';
+  state.groups.sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0));
+
+  // Ensure activeGroupId is valid (fallback to __all__ if the group was deleted)
+  const validIds = new Set(['__all__', ...state.groups.map(g => g.id)]);
+  if (!validIds.has(activeGroupId)) activeGroupId = '__all__';
+
+  const allVisible = state.tasks.filter(taskMatchesFilters).length;
+  const allTab = el('button', {
+    class: 'group-tab' + (activeGroupId === '__all__' ? ' active' : ''),
+    onclick: () => setActiveGroup('__all__')
+  }, [
+    el('span', { class: 'group-tab-icon' }, '◉'),
+    'All',
+    el('span', { class: 'group-tab-count' }, `${allVisible}/${state.tasks.length}`)
+  ]);
+  container.appendChild(allTab);
+
+  state.groups.forEach(g => {
+    const groupTasks = state.tasks.filter(t => t.group_id === g.id);
+    const visible = groupTasks.filter(taskMatchesFilters).length;
+    const tab = el('button', {
+      class: 'group-tab' + (activeGroupId === g.id ? ' active' : ''),
+      onclick: () => setActiveGroup(g.id)
+    }, [
+      el('span', { class: 'group-tab-icon' }, g.icon || '•'),
+      g.name,
+      el('span', { class: 'group-tab-count' }, `${visible}/${groupTasks.length}`)
+    ]);
+    container.appendChild(tab);
+  });
+}
+
 function renderBoard() {
   const container = $('board');
   container.innerHTML = '';
   state.groups.sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0));
-  state.groups.forEach(g => {
+  const groupsToRender = activeGroupId === '__all__'
+    ? state.groups
+    : state.groups.filter(g => g.id === activeGroupId);
+  groupsToRender.forEach(g => {
     const groupTasks = state.tasks.filter(t => t.group_id === g.id);
     container.appendChild(renderGroup(g, groupTasks));
   });
@@ -2157,6 +2234,7 @@ function renderRepo() {
 
 function renderAll() {
   if ($('app').style.display === 'none') return;
+  renderGroupTabs();
   renderBoard();
   renderKpiStrip();
   renderKpiTable();
@@ -2179,26 +2257,28 @@ $('tabs').addEventListener('click', e => {
   if (view !== 'interview-detail') state.current_interview_id = null;
 });
 
-$('filter-search').addEventListener('input', e => { filters.search = e.target.value; renderBoard(); });
+function refreshBoardView() { renderGroupTabs(); renderBoard(); }
+
+$('filter-search').addEventListener('input', e => { filters.search = e.target.value; refreshBoardView(); });
 document.querySelectorAll('[data-filter-owner]').forEach(b => {
   b.addEventListener('click', () => {
     filters.owner = b.dataset.filterOwner;
     document.querySelectorAll('[data-filter-owner]').forEach(x => x.classList.toggle('active', x === b));
-    renderBoard();
+    refreshBoardView();
   });
 });
 document.querySelectorAll('[data-filter-status]').forEach(b => {
   b.addEventListener('click', () => {
     filters.status = filters.status === b.dataset.filterStatus ? '' : b.dataset.filterStatus;
     b.classList.toggle('active', filters.status === b.dataset.filterStatus);
-    renderBoard();
+    refreshBoardView();
   });
 });
 document.querySelectorAll('[data-filter-priority]').forEach(b => {
   b.addEventListener('click', () => {
     filters.priority = filters.priority === b.dataset.filterPriority ? '' : b.dataset.filterPriority;
     b.classList.toggle('active', filters.priority === b.dataset.filterPriority);
-    renderBoard();
+    refreshBoardView();
   });
 });
 
