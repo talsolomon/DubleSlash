@@ -1,0 +1,60 @@
+name: Sync repo commits
+
+# Inserts every push to main into public.repo_commits so the REPO ACTIVITY
+# widget on the task board stays live without anyone writing a migration by
+# hand. Uses the already-configured SUPABASE_DB_PASSWORD + SUPABASE_PROJECT_ID
+# secrets that the supabase-migrate workflow uses.
+#
+# Handles multi-commit pushes by replaying every sha between the previous
+# ref and HEAD (falls back to just HEAD on initial/force push where `before`
+# is all-zeros). Idempotent — repeated runs are no-ops thanks to the
+# `on conflict (sha) do nothing` clause.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 50
+
+      - name: Insert pushed commits into repo_commits
+        env:
+          PGPASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+          SUPABASE_PROJECT_ID: ${{ secrets.SUPABASE_PROJECT_ID }}
+          BEFORE_SHA: ${{ github.event.before }}
+        run: |
+          set -euo pipefail
+
+          # On initial push or force-push, github.event.before is 40 zeros.
+          # In that case, only sync HEAD — backfills live in migration files.
+          if [[ "${BEFORE_SHA:-}" =~ ^0+$ ]] || [[ -z "${BEFORE_SHA:-}" ]]; then
+            RANGE_START="HEAD~1"
+          else
+            RANGE_START="$BEFORE_SHA"
+          fi
+
+          SHAS=$(git log "${RANGE_START}..HEAD" --reverse --pretty=format:'%H' || true)
+
+          if [[ -z "$SHAS" ]]; then
+            echo "No commits to sync."
+            exit 0
+          fi
+
+          DB_URL="postgresql://postgres:${PGPASSWORD}@db.${SUPABASE_PROJECT_ID}.supabase.co:5432/postgres?sslmode=require"
+
+          for full in $SHAS; do
+            SHA=$(git rev-parse --short=7 "$full")
+            MSG=$(git log -1 "$full" --pretty=%s)
+            TS=$(git log -1 "$full" --pretty=%aI)
+            echo "Inserting: $SHA — $MSG @ $TS"
+            psql "$DB_URL" \
+              -v ON_ERROR_STOP=1 \
+              -v "sha=$SHA" -v "msg=$MSG" -v "ts=$TS" \
+              -c "insert into public.repo_commits (sha, msg, seen_at) values (:'sha', :'msg', :'ts') on conflict (sha) do nothing;"
+          done
