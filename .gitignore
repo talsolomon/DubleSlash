@@ -11,3 +11,6 @@ supabase/bootstrap-users.sql
 
 # HyperFrames auto-generated preview thumbnails — regenerated on every render.
 **/.thumbnails/
+
+# Microsoft Office lock files (open doc → ~$filename.docx/pptx).
+~$*
