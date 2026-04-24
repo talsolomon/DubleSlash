@@ -190,7 +190,7 @@ D+30          30-day retro — did we hit stars / installs / LLM-lab convo.
 > That's **phase drift**. FLOW is how we fix it.
 
 **Hook 2 — one shared vocabulary:**
-> Designer: "It's a Willie."
+> Designer: "It's a Willy."
 > PM: "I thought it was a Tuna."
 > Developer: "Handoff says 'acceptance criteria locked' — I'm good."
 > *Sigils + phases = the vocabulary your team's AI has been missing.*

@@ -1,0 +1,98 @@
+# Duble Slash agents — project-wide config
+# Read on activation by every operator and expert SKILL.md.
+
+project_name: Duble Slash
+method: FLOW
+
+# User-facing settings (overridable per-install in `.flow/flow.yaml`)
+user_name: Tal
+user_skill_level: expert
+user_role: product-design-executive
+
+# Language
+communication_language: English
+document_output_language: English
+
+# Paths (relative to project-root)
+planning_artifacts: "{project-root}/planning"
+implementation_artifacts: "{project-root}/planning/stories"
+project_knowledge: "{project-root}/planning/research"
+methodology: "{project-root}/methodology"
+flow_spec: "{project-root}/methodology/flow.md"
+
+# Output folders (created on demand)
+output_folder: planning
+handoff_folder: "{project-root}/.flow/handoffs"
+card_folder: "{project-root}/.flow/cards"
+
+# Agent system
+operator_layer: "{project-root}/agents/operators"
+expert_layer: "{project-root}/agents/experts"
+helpers: "{project-root}/agents/helpers"
+
+# Model policy — applies to every subagent, helper, sub-skill, and /loop or scheduled
+# trigger spawned from this project. Top-level session model is set at launch and is
+# out of scope here.
+#
+# Principle: pick the model that matches the moment. Match the model's strength
+# to the shape of the work — cheap + fast for tagging, extraction, schema emits;
+# judgment-strong for generative reframing, adversarial reasoning, interpretive
+# synthesis. The right model is the one that does *this specific job* well,
+# not the most expensive you can afford.
+model_policy:
+  default: haiku                     # extraction, tagging, schema-validated emits, structured
+                                     # composition, single-hop lookups. Fast, cheap, accurate
+                                     # at the shape of work most Dora sub-methods produce.
+  escalate_to: sonnet                # generative reframing, multi-step synthesis, adversarial
+                                     # reasoning, interpretive judgment. Worth the spend when
+                                     # the task's value depends on the quality of the thinking.
+  forbidden: [opus]                  # off the menu — not in our cost/value band for any method
+                                     # currently on the roster.
+
+  # Per-capability hints — why *this* model for *this* method.
+  hints:
+    # Dora sub-methods
+    sa: haiku                        # Sigil Assist: rule-based classification over a 2×2 matrix.
+    hs: sonnet                       # Heuristic Scan: 4-pass expert read — judgment across
+                                     # conventions, risks, gaps, recommendation.
+    hmw: sonnet                      # How-Might-We: generative reframing across 5 lenses.
+                                     # Haiku HMWs come back shallow and repetitive.
+    jm: haiku                        # Journey Map: structured extraction into stage × dimension
+                                     # table. Sonnet for Willy-scale multi-persona ethnography.
+    cs: haiku                        # Competitor scan: pattern aggregation across parallels.
+                                     # Sonnet when the output is a positioning-axis map.
+    ip: haiku                        # Interview Plan: templated generation (cohort, RQs, guide).
+    nb: haiku                        # Nugget Board: atomic-unit tagging + clustering at scale.
+                                     # Sonnet when contradictions need interpretive work.
+    pm: sonnet                       # Premortem: adversarial reasoning with probability × severity.
+                                     # Haiku produces generic failure modes, not specific ones.
+    sr: haiku                        # Stream Recap: summarization under a tight word budget.
+    # Sol sub-methods
+    sk: sonnet                       # Sketch: pick ONE shape over alternatives — judgment, not
+                                     # enumeration. Haiku picks the first-mentioned option.
+    br: sonnet                       # Brief: templated structure is Haiku-shaped, but shape choice,
+                                     # AC sharpness, and out-of-scope honesty reward judgment.
+    sb: sonnet                       # Storyboard: panel generation + caption tightness + branch
+                                     # identification is narrative. Haiku returns screen-grabs.
+    pt: sonnet                       # Pitch/RFC: long-form, interpretive, adversarial. Sonnet always.
+                                     # Haiku pitches come back as feature lists under headers.
+    ct: haiku                        # Concept Test: templated plan (cohort, prototype, RQs, tasks,
+                                     # pass/fail). Escalate to Sonnet on novel prototype specs.
+    ac: sonnet                       # Acceptance Criteria: the REWRITE pass ('should be fast' →
+                                     # '≤ 500ms p95') needs domain judgment. Haiku drafts; Sonnet sharpens.
+    mp: haiku                        # Measurement Plan: templated (metric, baseline, target,
+                                     # instrumentation, stop-the-line). Substance is the user's, not model's.
+    dl: sonnet                       # Decision Log: reasoning + reversibility + revisit conditions
+                                     # reward judgment. Haiku revisits come back generic.
+    ta: sonnet                       # Tradeoff Axes: naming a REAL tension vs. strawman is creative
+                                     # judgment. Haiku TA reads as 'good ↔ bad'.
+    wf: sonnet                       # Wireframe Spec: Saffer microinteraction annotation needs
+                                     # judgment. Structural wireframe description can drop to Haiku.
+    ad: sonnet                       # ADR: consequences ('becomes harder' side) require judgment.
+                                     # Haiku ADRs have generic consequences like 'increases complexity'.
+    # Helpers
+    ho: haiku                        # Handoff compose: schema-validated block emission.
+    hb: haiku                        # Handback compose: schema-validated reverse emission.
+
+  # Subagents get `model` passed explicitly on every spawn — no silent defaults.
+  enforcement: explicit

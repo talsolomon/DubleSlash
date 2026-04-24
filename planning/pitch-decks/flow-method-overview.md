@@ -39,7 +39,7 @@ style: |
 
 A methodology that makes AI-assisted product work actually ship — with the designer / PM / dev in control, not watching.
 
-<span class="small">**FLOW** — the AI-era evolution of the FISH model (Tal Solomon, 2024). Same fish types (Nemo / Tuna / Salmon / Willie); now in motion — iteration first-class, AI agents nudging the method, handoffs that travel across tools. Pairs with the company value *"flows, not frames."*</span>
+<span class="small">**FLOW** — the AI-era evolution of the FISH model (Tal Solomon, 2024). Same fish types (Nemo / Tuna / Salmon / Willy); now in motion — iteration first-class, AI agents nudging the method, handoffs that travel across tools. Pairs with the company value *"flows, not frames."*</span>
 
 <span class="small">Source methodology doc: [`methodology/flow.md`](../../../methodology/flow.md)</span>
 
@@ -81,7 +81,7 @@ These aren't process quibbles. These are the reasons AI-assisted projects ship l
 | FISH (2024, Tal Solomon) | FLOW (2026) |
 |---|---|
 | Fish-shaped: linear head → body → tail | The fish *moves*: iteration inside every phase, reverse flow allowed |
-| 4 fish types (Nemo / Tuna / Salmon / Willie) by size × familiarity | **Kept.** Same four; AI-era methods inside them. |
+| 4 fish types (Nemo / Tuna / Salmon / Willy) by size × familiarity | **Kept.** Same four; AI-era methods inside them. |
 | PD leader per fish type | **Kept + upgraded:** PD leader picks the AI expert-agent that leads the card. |
 | Brief-not-PRD, journey meetings, micro-brief | **Kept.** Core principles untouched. |
 | Sprint-shaped delivery | **Dropped.** AI lets us ship continuously; no sprint cadence. |
@@ -110,7 +110,7 @@ These aren't process quibbles. These are the reasons AI-assisted projects ship l
 <p><em>e.g. tooltip copy fix</em></p>
 </div>
 <div>
-<h4>🐋 Willie — big, unfamiliar</h4>
+<h4>🐋 Willy — big, unfamiliar</h4>
 <p>Strategic. Full team.</p>
 <p>Heavy research. Researcher + founder leading.</p>
 <p><em>e.g. new product area</em></p>
@@ -134,12 +134,12 @@ These aren't process quibbles. These are the reasons AI-assisted projects ship l
 | **Nemo** | small × familiar | one session → ship same day | Low | Designer |
 | **Tuna** | big × familiar | a few days → a couple weeks | Low | Designer |
 | **Salmon** | small × unfamiliar | a few days → a couple weeks | High | Researcher |
-| **Willie** | big × unfamiliar | weeks → a month+ | High | Researcher + founder / PM |
+| **Willy** | big × unfamiliar | weeks → a month+ | High | Researcher + founder / PM |
 
 - **Nemo** — quick, conventional. No long meetings, no PRD.
 - **Tuna** — bigger scope, established patterns. Multi-screen, storyboard-led.
 - **Salmon** — research-led. Few refined screens. Validate problem before shipping.
-- **Willie** — strategic. Full team. Maximum methodology.
+- **Willy** — strategic. Full team. Maximum methodology.
 
 <span class="ai">[AI-era]</span> *PD leader* picks which expert agent leads the card. Designer-led on top row; researcher-led on bottom.
 
@@ -168,7 +168,7 @@ These aren't process quibbles. These are the reasons AI-assisted projects ship l
 
 Cells read **additively** — each bigger fish inherits the smaller fish's methods *plus* its own.
 
-| Phase | 🐠 **Nemo** | 🐟 **Tuna** | 🐡 **Salmon** | 🐋 **Willie** |
+| Phase | 🐠 **Nemo** | 🐟 **Tuna** | 🐡 **Salmon** | 🐋 **Willy** |
 |---|---|---|---|---|
 | **Explore** | Competitor scan · Heuristic eval · Micro-brief · Abstraction laddering | *+* Journey meeting · OSD · Convention inventory · Stakeholder mapping | *+* User interviews · Fly-on-the-wall observation · JTBD · Journey map · **Affinity clustering** · Empathy map | *+* Contextual inquiry · Premortem · Scenario planning · Pitch outline · **Problem tree analysis** · 5 forces · Opportunity solution tree |
 | **Solidify** | HMW · Problem framing · One sketch · 3–5 AC bullets | *+* Storyboard · Brief · Microinteractions · DS-extension · Journey meeting · Statement starters | *+* Concept test · Measurement plan · Evidence-informed AC · **Rose/thorn/bud** · Concept poster | *+* 5 whys · SWOT · Pitch/RFC · Decision log · Multi-level AC · **Importance/difficulty matrix** · **Bull's-eye diagram** · Kano · RICE · Impact mapping |
@@ -177,7 +177,7 @@ Cells read **additively** — each bigger fish inherits the smaller fish's metho
 
 ## 8 · Method matrix — Build + Ship
 
-| Phase | 🐠 **Nemo** | 🐟 **Tuna** | 🐡 **Salmon** | 🐋 **Willie** |
+| Phase | 🐠 **Nemo** | 🐟 **Tuna** | 🐡 **Salmon** | 🐋 **Willy** |
 |---|---|---|---|---|
 | **Build** | Smallest change · Golden-path test · AC-as-tests | *+* Storyboarding · Fake prototypes · Iterative prototyping · Component-library-first · Motion principles · Joint review · **Creative matrix** · Crazy 8s | *+* Co-creation · Wizard-of-Oz prototyping · Instrumented build · **Think-aloud testing** · Iterate-once | *+* Thin vertical slice · Integrated requirements · Staged rollout per slice · Measure per slice · Marathons · Reversed solutions · Round robin · SCAMPER |
 | **Ship** | Beta group · Heatmap · 1-line changelog · Trust receipt | *+* Feedback loops · Private preview · Release notes · Journey meeting · First-click test | *+* Usability · Baseline + post measurement · Learning log · Next-loop queue · ISO 9241 triad · First-impression test | *+* A/B test · Canary release · Staged rollout (internal → alpha → beta → GA) · Retrospective (Rose/thorn/bud, Sailboat, 4Ls) · Master trust receipt · Continuous-discovery interviews |

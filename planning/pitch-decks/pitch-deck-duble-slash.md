@@ -240,15 +240,15 @@ Tools multiplied: Claude, ChatGPT, Cursor, Copilot, Perplexity, Figma AI, v0, Re
                           KNOWN
                             ▲
                Tuna         │         Nemo
-         (big × known)      │    (small × known)
+         (known × big)      │    (known × small)
    ──── BIGGER ─────────────┼──────────── SMALLER ──▶
-              Willie        │        Salmon
-         (big × unknown)    │   (small × unknown)
+              Willy        │        Salmon
+         (unknown × big)    │   (unknown × small)
                             ▼
                         UNKNOWN
 ```
 
-`sigil: { size: bigger|smaller, certainty: known|unknown }` — drives how much ritual each phase gets. A Nemo's Explore is a 10-min heuristic scan; a Willie's is interviews + premortem + RFC prep.
+`sigil: { certainty: known|unknown, size: smaller|bigger }` — certainty decided first (size estimates are unreliable in unknown space). Drives how much ritual each phase gets. A Nemo's Explore is a 10-min heuristic scan; a Willy's is interviews + premortem + RFC prep.
 
 </div>
 
@@ -288,7 +288,7 @@ Left + right body = the two diamonds of the **Double Diamond**. Head = pre-diamo
 | Failure mode | What it looks like | What FISH does |
 |---|---|---|
 | **Phase drift** | You ask "what should I consider?" and five prompts later you have wireframes and no research. The AI silently jumped Explore → Build. | Explorer **refuses** Solidify-shaped requests. Names the phase the request belongs to and offers a handoff. |
-| **Intensity mismatch** | A one-hour tooltip change becomes a six-page research doc with personas and journey maps. The AI's default is "comprehensive." | The archetype × phase matrix tells the agent what *right-sized* looks like. No thesis for a Nemo, no napkin for a Willie. |
+| **Intensity mismatch** | A one-hour tooltip change becomes a six-page research doc with personas and journey maps. The AI's default is "comprehensive." | The archetype × phase matrix tells the agent what *right-sized* looks like. No thesis for a Nemo, no napkin for a Willy. |
 | **Context amnesia** | You explored a feature with Claude yesterday. Today you re-paste 30 messages, or you start over. (You usually start over.) | `<FISH-handoff>` *is* the thread. Sigil + locked + open + artifacts in one short block. Paste; resume. No re-briefing. |
 | **Trust opacity** | "A quick polish pass" rewrote three microcopy strings, added a feature flag, and proposed a new IA. You caught two of those. Did you catch all three? | Every release emits a **trust receipt** — what shipped, what was redacted, who approved it. Reviewable by you and (V1) your teammate. |
 
@@ -483,8 +483,8 @@ Type inside Claude Desktop, Cursor, ChatGPT Desktop, Terminal, Perplexity:
 
 ```
 //explore onboarding redesign — self-serve signup
-  → Nova confirms sigil (bigger × unknown → Willie)
-  → Runs Willie-intensity Explore
+  → Nova confirms sigil (unknown × bigger → Willy)
+  → Runs Willy-intensity Explore
   → Refuses to wireframe
   → Emits <FISH-handoff to: solidifier>
 

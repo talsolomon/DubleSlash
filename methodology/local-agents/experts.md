@@ -43,7 +43,7 @@ At the end of **turn 1 on a fresh card** and on **obvious topic shift** mid-card
 
 Rules the agent follows when picking the offers:
 
-1. **Match on sigil.** Salmon → `@ux-research` + `@measurement`. Willie → `@strategy` + `@premortem` + an industry vertical if the card names one. Nemo → `@microcopy` or narrow craft experts. Tuna → craft or domain experts.
+1. **Match on sigil.** Salmon → `@ux-research` + `@measurement`. Willy → `@strategy` + `@premortem` + an industry vertical if the card names one. Nemo → `@microcopy` or narrow craft experts. Tuna → craft or domain experts.
 2. **Match on keywords.** Regex over card title + recent user messages. "billing" → `@fintech` or `@regulated-fin`. "auth" → `@authn` + `@authz`. "onboarding" → `@onboarding` + `@activation`.
 3. **Phase gate.** Only offer experts whose `primary phase` column includes the current phase (E, S, B, Sh).
 4. **No duplicates per session** unless the user returns from a handback or the topic genuinely shifts.

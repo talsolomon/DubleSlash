@@ -140,7 +140,7 @@ started_at:    ISO 8601
 ended_at:      ISO 8601 · null while active
 goal:          string · extracted from opening prompt
 card_id:       string · null if no FLOW card in play
-sigil:         {size, certainty} · null if none
+sigil:         {certainty, size} · null if none
 phase:         explore | solidify | build | ship · null if none
 agent:         explorer | solidifier | builder | shipper · null if none
 handoffs:      [ { ts, from, to, card_id, hash } ]   # indexed separately
@@ -260,8 +260,8 @@ pickup_notification:
   handoff_id:    uuid
   card_id:       string
   card_title:    string
-  sigil:         {size, certainty}
-  archetype:     nemo | tuna | salmon | willie
+  sigil:         {certainty, size}
+  archetype:     nemo | tuna | salmon | willy
   from_agent:    explorer | solidifier | builder | shipper
   to_agent:      same set (next phase)
   from_user:     {id, display}
@@ -280,7 +280,7 @@ pickup_notification:
 
 **Job:** Assemble a context pack on demand for any teammate. Powers:
 - Live handoff pickup (Marcus opens the card; Context Bundler gives him everything he needs).
-- New-joiner onboarding (a new hire gets a pack of recent Tuna + Willie handoffs, archetype-tagged).
+- New-joiner onboarding (a new hire gets a pack of recent Tuna + Willy handoffs, archetype-tagged).
 - "Catch me up" for anyone returning from leave.
 
 **What's in a pack:**
@@ -321,7 +321,7 @@ context_pack:
 **Job:** Narrate "today at a glance" for the team. Replaces async standups.
 
 **What it produces:**
-> *"This morning across your team: 3 Salmons in Explore (led by Sarah), 2 Tunas in Build (with Marcus), 1 Willie entering Solidify (Tal is owning the pitch). Blockers: one reverse-handoff on the billing Tuna — Builder wants Solidify to clarify AC #7."*
+> *"This morning across your team: 3 Salmons in Explore (led by Sarah), 2 Tunas in Build (with Marcus), 1 Willy entering Solidify (Tal is owning the pitch). Blockers: one reverse-handoff on the billing Tuna — Builder wants Solidify to clarify AC #7."*
 
 **Design rules:**
 - **Sigil-aware.** Uses FLOW vocabulary; teammates read phase + archetype, not "sprint 3 item."
@@ -338,7 +338,7 @@ digest:
   digest_id:     uuid
   team_id:       string
   window:        { from: ISO, to: ISO }    # typically 24h
-  sigil_counts:  { nemo: n, tuna: n, salmon: n, willie: n }
+  sigil_counts:  { nemo: n, tuna: n, salmon: n, willy: n }
   phase_counts:  { explore: n, solidify: n, build: n, ship: n }
   deltas:
     advanced:    [ { card_id, from_phase, to_phase, by_user } ]
@@ -395,7 +395,7 @@ twin_response:
 
 **Job:** Verify each card carries the required attributes per the team's `flow.yaml` spec.
 
-**`flow.yaml` is a declarative methodology file** — a team-level config that says *"for Salmons and Willies, every card must have an interview-notes artifact before Solidify; for Tunas, a design-system-extension decision must be logged."*
+**`flow.yaml` is a declarative methodology file** — a team-level config that says *"for Salmons and Willys, every card must have an interview-notes artifact before Solidify; for Tunas, a design-system-extension decision must be logged."*
 
 **What Flow Checker does:**
 - Reads `flow.yaml` at card entry.
@@ -435,7 +435,7 @@ flow_check:
 
 **Examples of per-team rules a Process agent enforces:**
 - *"No card moves to Build without an approved brief."*
-- *"Willies require two reviewers on the Solidify handoff."*
+- *"Willys require two reviewers on the Solidify handoff."*
 - *"Salmons require a measurement plan before Build."*
 
 **Design rules:**
@@ -479,8 +479,8 @@ This is load-bearing. It is part of the integrity GTM pillar, not separate from 
 ### 4.2 Same FLOW vocabulary as local agents
 
 All system agents read:
-- `sigil` (size × certainty)
-- `archetype` (Nemo / Tuna / Salmon / Willie)
+- `sigil` (certainty × size — certainty decided first, see flow.md §3.1)
+- `archetype` (Nemo / Tuna / Salmon / Willy)
 - `phase` (Explore / Solidify / Build / Ship)
 - `<FLOW-handoff>` blocks
 
@@ -621,7 +621,7 @@ flow.yaml (team-level):
         - measurement_plan: artifact
       build_requires:
         - concept_test_result: artifact
-    willie:
+    willy:
       solidify_requires:
         - pitch: artifact
         - decision_log: artifact

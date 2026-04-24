@@ -3,9 +3,9 @@ name: FLOW — the method (one doc)
 description: The canonical FLOW methodology — the AI-era evolution of the 2024 Fish Model. One file, every concept. Axes, fish types, phases, curated method sets per cell, per-fish streams, handoff contract, agent posture, worked examples. Merges and supersedes the prior fish/ folder.
 type: methodology-spec
 owner: Tal
-version: 2.0.0
+version: 2.0.1
 renamed_from: FISH
-revised: 2026-04-24
+revised: 2026-04-24 (rev-2: certainty-before-size decision order)
 lineage: Bánáthy (1960s–70s) → Double Diamond (UK Design Council, 2004/2019) → Fish Model (Tal Solomon, 2024) → FLOW (this spec, 2026)
 ---
 
@@ -19,12 +19,12 @@ lineage: Bánáthy (1960s–70s) → Double Diamond (UK Design Council, 2004/201
 
 The method has two audiences and two origin stories:
 
-- **Origin A — designers, 2024 →** the **Fish Model** (Tal Solomon, [talsolomonux.com/p/0d2](https://www.talsolomonux.com/p/0d2)) — an anti-waterfall alternative to "every project is a six-month PRD-driven sprint." Sized work by *kind of fish* (Nemo / Tuna / Salmon / Willie); let the intensity of ritual match the kind. Used by design teams on their own discipline.
+- **Origin A — designers, 2024 →** the **Fish Model** (Tal Solomon, [talsolomonux.com/p/0d2](https://www.talsolomonux.com/p/0d2)) — an anti-waterfall alternative to "every project is a six-month PRD-driven sprint." Sized work by *kind of fish* (Nemo / Tuna / Salmon / Willy); let the intensity of ritual match the kind. Used by design teams on their own discipline.
 - **Origin B — AI-era, 2026 →** **FLOW** — the Fish Model in motion: iteration first-class, AI agents nudging the method forward, machine-readable handoffs that travel across sessions / tools / teammates. The fish was a static diagram; FLOW is the fish moving. Agents make discipline cheap — humans-alone often skip their own method; agents don't.
 
 This doc is one source of truth for both. Where a section is an AI-era addition that extends the original Fish Model, it is marked **[AI-era]**. Every other section is preserved from the original.
 
-**The work-classification noun is still "fish"** — you ask *"what fish is this?"* and get Nemo / Tuna / Salmon / Willie. **The methodology is FLOW** — the discipline that runs around the fish. (Pairs with the company value *"Flows, not frames."*)
+**The work-classification noun is still "fish"** — you ask *"what fish is this?"* and get Nemo / Tuna / Salmon / Willy. **The methodology is FLOW** — the discipline that runs around the fish. (Pairs with the company value *"Flows, not frames."*)
 
 ---
 
@@ -68,17 +68,19 @@ One shared vocabulary throughout — **sigil → archetype → phase → curated
 
 A card — the unit of work — sits on two axes. The pair is its **sigil**. The sigil picks an **archetype** (the kind of fish). The archetype decides **how intense each of four phases runs** and **which specific methods are used in each cell**. Every transition between phases emits a `<FLOW-handoff>` block that the next phase (or tomorrow's session, or a teammate) can read cold.
 
+**Order of decision:** certainty first, then size. Size estimates are unreliable in a space the team doesn't understand, so you check familiarity before guessing surface area (see §3).
+
 ```
        ▲ known / high familiarity
        │
-       │    Tuna (big × known)        Nemo (small × known)
+       │    Tuna (known × bigger)     Nemo (known × smaller)
        │    1+ sprint                 ≤1 sprint
        │    low partner involvement   low partner involvement
        │    PD lead: designer         PD lead: designer
        │
   ─────┼─────────────────────────────────────────────────▶  scope (bigger ← → smaller)
        │
-       │    Willie (big × unknown)    Salmon (small × unknown)
+       │    Willy (unknown × bigger) Salmon (unknown × smaller)
        │    3+ sprints                2+ sprints
        │    high partner involvement  high partner involvement
        │    PD lead: researcher       PD lead: researcher
@@ -97,33 +99,26 @@ Phases (fish anatomy, left to right):
   aperture       one shape          locked shape          narrate, measure
 ```
 
-Every phase has a **curated method set per archetype** — not adjectives ("heavy / heaviest") but specific named methods (see §6). A Nemo Explore is *exactly* a heuristic scan + competitor scan + micro-brief. A Willie Explore is *exactly* interviews + contextual inquiry + JTBD + premortem + scenario planning + pitch outline. The intensity matrix is a recipe, not a vibe.
+Every phase has a **curated method set per archetype** — not adjectives ("heavy / heaviest") but specific named methods (see §6). A Nemo Explore is *exactly* a heuristic scan + competitor scan + micro-brief. A Willy Explore is *exactly* interviews + contextual inquiry + JTBD + premortem + scenario planning + pitch outline. The intensity matrix is a recipe, not a vibe.
 
 ---
 
 ## 3. The sigil
 
-Every card carries a **sigil** — the pair `(size, certainty)`. The sigil is:
+Every card carries a **sigil** — the pair `(certainty, size)`. The sigil is:
 
 - **First-class.** Every card has one; no unsigiled cards.
 - **Machine-readable.** Used by agents (and handoffs) verbatim.
-- **Mutable.** Can change mid-lifecycle if the work turns out to be bigger or less familiar than expected. Sigil changes are *announced*, never smuggled (§11).
+- **Mutable.** Can change mid-lifecycle if the work turns out to be less familiar or bigger than expected. Sigil changes are *announced*, never smuggled (§11).
+- **Decided in order:** certainty first, then size. Rationale in §3.1.
 
 ```
 sigil:
-  size:      bigger | smaller
   certainty: known  | unknown
+  size:      smaller | bigger
 ```
 
-### 3.1 Size axis — scope (היקף)
-
-Measured by **expected surface area of the final artifact**, not effort.
-- **Smaller** — fits in one session; ≤ 1–3 screens; one acceptance-criterion category.
-- **Bigger** — multi-session; multi-screen or system-level; multiple AC categories.
-
-**Default rule:** when uncertain, default to bigger. Over-sizing costs a bit of process overhead; under-sizing skips research and ships broken work.
-
-### 3.2 Certainty axis — prior familiarity (היכרות מוקדמת)
+### 3.1 Certainty axis — prior familiarity (היכרות מוקדמת) · **decide first**
 
 Measured by **the team's prior familiarity with the user and the solution space**, not technical complexity.
 - **Known** — we have shipped similar work; conventions, users, and patterns exist.
@@ -131,13 +126,23 @@ Measured by **the team's prior familiarity with the user and the solution space*
 
 **Familiarity is per-team.** A billing flow is Known for a payments team, Unknown for a greenfield startup. A mobile-web interaction is Known for an e-commerce squad, Unknown for a data-engineering squad that hasn't touched UX in two years.
 
+**Why certainty is decided first:** size estimates are unreliable in a space you don't understand. If you size before you check what you know, you will confidently under-estimate every card whose surface area is concealing unknowns. A "small copy fix" in an unfamiliar flow regularly reveals itself — three days in — to be a redesign. The honest move is to check familiarity first (five-minute assessment: competitor glance, team parallels, four-part familiarity check), and only then estimate size.
+
+### 3.2 Size axis — scope (היקף) · **decide after certainty**
+
+Measured by **expected surface area of the final artifact**, not effort.
+- **Smaller** — fits in one session; ≤ 1–3 screens; one acceptance-criterion category.
+- **Bigger** — multi-session; multi-screen or system-level; multiple AC categories.
+
+**Default rule:** when the space is unknown or the team is uncertain, default to bigger. Over-sizing costs a bit of process overhead; under-sizing skips research and ships broken work.
+
 ### 3.3 Sigil examples
 
 ```
-sigil: { size: smaller, certainty: known   }  → Nemo
-sigil: { size: bigger,  certainty: known   }  → Tuna
-sigil: { size: smaller, certainty: unknown }  → Salmon
-sigil: { size: bigger,  certainty: unknown }  → Willie
+sigil: { certainty: known,   size: smaller }  → Nemo
+sigil: { certainty: known,   size: bigger  }  → Tuna
+sigil: { certainty: unknown, size: smaller }  → Salmon
+sigil: { certainty: unknown, size: bigger  }  → Willy
 ```
 
 Selection is mechanical — no debate. If the card owner can't pick, the Explorer agent assists in the first 5 minutes of Explore; the card always leaves Explore with a sigil.
@@ -154,12 +159,12 @@ Rule: the current agent **emits a sigil-change handoff** before continuing. The 
 
 Each archetype is a **recipe for lifecycle intensity** — sprint capacity, partner involvement, leadership assignment, and (§6) curated method selection per phase. Archetypes are derived mechanically from the sigil.
 
-| Archetype | Hebrew | Sigil | Shape (continuous, not sprint-based) | Partner involvement | PD leader |
+| Archetype | Hebrew | Sigil (certainty × size) | Shape (continuous, not sprint-based) | Partner involvement | PD leader |
 |---|---|---|---|---|---|
-| **Nemo** | נמו | smaller × known | one session → same-day ship | Low | Designer (מעצבת) |
-| **Tuna** | טונה | bigger × known | a few days → a couple weeks | Low | Designer |
-| **Salmon** | סלמון | smaller × unknown | a few days → a couple weeks | High | Researcher (חוקרת) |
-| **Willie** | ווילי | bigger × unknown | weeks → a month+ | High | Researcher + founder / PM |
+| **Nemo** | נמו | known × smaller | one session → same-day ship | Low | Designer (מעצבת) |
+| **Tuna** | טונה | known × bigger | a few days → a couple weeks | Low | Designer |
+| **Salmon** | סלמון | unknown × smaller | a few days → a couple weeks | High | Researcher (חוקרת) |
+| **Willy** | ווילי | unknown × bigger | weeks → a month+ | High | Researcher + founder / PM |
 
 > **Note (AI-era):** the original 2024 Fish Model used sprint-band estimates (≤1 sprint, 1+, 2+, 3+). With AI agents running method discipline continuously, FLOW doesn't assume sprint cadence anymore — work ships when the phase exits cleanly, not when a sprint clock rolls over. Sprint bands retained as rough calibration only; not a schedule contract.
 
@@ -168,7 +173,7 @@ Short posture per fish:
 - **Nemo** — quick, conventional, heuristic-driven. "לא צריך PRD או ישיבות ארוכות" (no PRD, no long meetings). Brief meetings; designer completes within one sprint using conventions.
 - **Tuna** — bigger scope, established patterns. Multiple screens, light research phase, storyboards to map flow, reliance on known patterns.
 - **Salmon** — heavy research-led phase; deep user interviews and stakeholder engagement. Few refined screens; intent is problem validation before launch. Led by a dedicated UX researcher.
-- **Willie** — strategic, month-long initiative; full team mobilization. Maximum methodology application; roadmap-committed.
+- **Willy** — strategic, month-long initiative; full team mobilization. Maximum methodology application; roadmap-committed.
 
 ### 4.1 How "PD leader" reads
 
@@ -176,14 +181,14 @@ The PD (product / design) leader is the **primary owner of methodological choice
 
 - **Designer-led (Nemo / Tuna):** a designer runs the card; the PM assists. The team is following conventions; design judgement is the load-bearing call.
 - **Researcher-led (Salmon):** a dedicated UX researcher runs the card; designer and PM assist. The bottleneck is understanding the user, not shipping.
-- **Researcher + founder / PM (Willie):** the UX researcher co-leads with the founder / strategic PM. Willies shape the roadmap; methodology and product-strategy calls are inseparable.
+- **Researcher + founder / PM (Willy):** the UX researcher co-leads with the founder / strategic PM. Willys shape the roadmap; methodology and product-strategy calls are inseparable.
 
-**[AI-era]** PD-leader assignment **directly picks the Layer-2 expert agent** that leads the card. A Nemo or Tuna is Design-agent-led; a Salmon is Researcher-agent-led (leans on the Analyst / Research expert); a Willie pulls in the strategic PM expert. See [agents-overview.md §5](./agents-overview.md) for the agent lifecycle.
+**[AI-era]** PD-leader assignment **directly picks the Layer-2 expert agent** that leads the card. A Nemo or Tuna is Design-agent-led; a Salmon is Researcher-agent-led (leans on the Analyst / Research expert); a Willy pulls in the strategic PM expert. See [agents-overview.md §5](./agents-overview.md) for the agent lifecycle.
 
 ### 4.2 Partner involvement
 
 - **Low (Nemo / Tuna):** few stakeholder check-ins; designer can decide unilaterally inside the shape; review at handoffs.
-- **High (Salmon / Willie):** continuous stakeholder engagement — users for research, cross-functional teammates for framing and prioritization. Cards at this level cannot be run alone.
+- **High (Salmon / Willy):** continuous stakeholder engagement — users for research, cross-functional teammates for framing and prioritization. Cards at this level cannot be run alone.
 
 **[AI-era]** Partner involvement maps directly to the V1 multiplayer handoff layer — low-involvement fish rarely need teammate sync; high-involvement fish invoke the Handoff / Relay / Beacon system agents constantly.
 
@@ -245,7 +250,7 @@ Each phase deepens from here — see §7 for per-archetype streams, §8 for the 
 - **Entry:** a problem statement (can be vague) + a proposed sigil (or request to set one).
 - **Exit:** problem framing stable enough that the next natural question is *"what shape?"* not *"what are we solving?"* — sigil confirmed — at least one entry-unknown resolved or explicitly deferred.
 - **Artifacts:** raw notes, interview transcripts, journey maps, competitor screenshots, HMW reframes, nugget board, one-paragraph framing summary, `<FLOW-handoff>` to Solidifier.
-- **Anti-patterns:** "Exploring" that produces wireframes. Interviewing to confirm, not discover. Nemo-sized Explore for a Salmon card. Willie-sized Explore for a Nemo card. Silent sigil change.
+- **Anti-patterns:** "Exploring" that produces wireframes. Interviewing to confirm, not discover. Nemo-sized Explore for a Salmon card. Willy-sized Explore for a Nemo card. Silent sigil change.
 
 #### Phase 2 — Solidify (left body) · מסגור
 
@@ -254,9 +259,9 @@ Each phase deepens from here — see §7 for per-archetype streams, §8 for the 
 - **Verbs:** decide, shape, sketch, spec, agree.
 - **Primary risk:** five half-shapes instead of one lock. Solidify produces **one** thing.
 - **Entry:** `<FLOW-handoff>` from Explorer with a framing, unknowns list, and artifacts (or — for Nemo / Tuna — a one-sentence brief if entering Solidify directly).
-- **Exit:** one shape doc exists (not five half-shapes) — AC written, each independently checkable — `open` list contains no build-blocking items — for Salmon / Willie, validation evidence from at least one concept test.
-- **Artifacts:** the brief (Nemo / Tuna / Salmon) or pitch / RFC (Willie); acceptance criteria; decision log (Willie); measurement plan (Salmon / Willie); deferred-scope list.
-- **Anti-patterns:** PRD sprawl (if the brief has a table of contents, you're hiding deferred scope). Open-ended "what do you think?" instead of default + accept / amend / reject. Skipping concept test on a Salmon. Willie without a measurement plan.
+- **Exit:** one shape doc exists (not five half-shapes) — AC written, each independently checkable — `open` list contains no build-blocking items — for Salmon / Willy, validation evidence from at least one concept test.
+- **Artifacts:** the brief (Nemo / Tuna / Salmon) or pitch / RFC (Willy); acceptance criteria; decision log (Willy); measurement plan (Salmon / Willy); deferred-scope list.
+- **Anti-patterns:** PRD sprawl (if the brief has a table of contents, you're hiding deferred scope). Open-ended "what do you think?" instead of default + accept / amend / reject. Skipping concept test on a Salmon. Willy without a measurement plan.
 
 #### Phase 3 — Build (right body) · עיצוב
 
@@ -264,10 +269,10 @@ Each phase deepens from here — see §7 for per-archetype streams, §8 for the 
 - **Posture:** executional. Smallest change that satisfies the contract. Diverge only where the brief leaves explicit latitude.
 - **Verbs:** implement, prototype, test, integrate.
 - **Primary risk:** scope creep + silent re-design. The Builder surfaces disagreement *once*, then either proceeds under the contract or hands back (§11).
-- **Entry:** `<FLOW-handoff>` from Solidifier with shape locked, AC written, `open` empty of blockers. For Salmon / Willie: a measurement plan.
+- **Entry:** `<FLOW-handoff>` from Solidifier with shape locked, AC written, `open` empty of blockers. For Salmon / Willy: a measurement plan.
 - **Exit:** artifact runnable (for code) or reviewable (for design) — golden path verified — `locked` edge cases covered — measurement hooks exist where the plan required them.
-- **Artifacts:** built code / designs / docs; test output; run instructions; instrumentation changes (Salmon / Willie); staged rollout plan (Willie).
-- **Anti-patterns:** re-designing in Build. Horizontal-layer builds instead of vertical slices. "Tests after." Gold-plating a Nemo. Willies built as one giant lump.
+- **Artifacts:** built code / designs / docs; test output; run instructions; instrumentation changes (Salmon / Willy); staged rollout plan (Willy).
+- **Anti-patterns:** re-designing in Build. Horizontal-layer builds instead of vertical slices. "Tests after." Gold-plating a Nemo. Willys built as one giant lump.
 
 > **Naming note.** The Hebrew name for this phase is עיצוב ("design") — from the original Fish Model's design-led framing. FLOW renames it **Build** because in the AI-era this phase includes engineering execution, not only design-mode prototyping. The method set here spans both (see §6).
 
@@ -279,8 +284,8 @@ Each phase deepens from here — see §7 for per-archetype streams, §8 for the 
 - **Primary risk:** a release without a narrative. A commit with no "why" is technical debt.
 - **Entry:** `<FLOW-handoff>` from Builder with runnable / reviewable artifact. Any measurement plan from Solidify is implemented.
 - **Exit:** work is available to its audience — trust receipt emitted — at least one learning captured for the next loop.
-- **Artifacts:** release notes / changelog / commit; trust receipt; learning log (Salmon / Willie); measurement readouts (Salmon / Willie); retrospective (Willie).
-- **Anti-patterns:** release with no narrative (commit messages that say "fixes" or "update"). Skipping the trust receipt even solo. No measurement on a Salmon or Willie. Papering over Builder bugs instead of handing back.
+- **Artifacts:** release notes / changelog / commit; trust receipt; learning log (Salmon / Willy); measurement readouts (Salmon / Willy); retrospective (Willy).
+- **Anti-patterns:** release with no narrative (commit messages that say "fixes" or "update"). Skipping the trust receipt even solo. No measurement on a Salmon or Willy. Papering over Builder bugs instead of handing back.
 
 > **Naming note.** Hebrew מימוש ("realize") is release-plus-validation. FLOW shortens to **Ship** to emphasize the release act; validation happens in-Ship via instrumentation, not as a separate phase.
 
@@ -293,7 +298,7 @@ If a phase produces five artifacts, it has four things the next phase can ignore
 - **Build:** one runnable thing (code, design, doc — one of them).
 - **Ship:** one trust receipt per release.
 
-Multiple phase-internal artifacts are fine (a Willie Explore has interviews, nuggets, journey maps, premortem) — but **one is canonical**, the rest are evidence.
+Multiple phase-internal artifacts are fine (a Willy Explore has interviews, nuggets, journey maps, premortem) — but **one is canonical**, the rest are evidence.
 
 ---
 
@@ -301,7 +306,7 @@ Multiple phase-internal artifacts are fine (a Willie Explore has interviews, nug
 
 This is the operational core. Given a card's archetype, each phase agent knows **which specific methods it runs** — not adjectives like "heavy" or "light," but named techniques from §8.
 
-| Phase | **Nemo** (small × known) | **Tuna** (big × known) | **Salmon** (small × unknown) | **Willie** (big × unknown) |
+| Phase | **Nemo** (known × small) | **Tuna** (known × big) | **Salmon** (unknown × small) | **Willy** (unknown × big) |
 |---|---|---|---|---|
 | **Explore** (למידה) | Competitor scan · Micro-brief · Heuristic evaluation | + Journey meetings · OSD · Convention inventory | + User interviews · Observations · JTBD · Nugget board · TZUMI · Task analysis | + Contextual inquiry · Goal-Directed Design · Premortem · Scenario planning · Pitch outline |
 | **Solidify** (מסגור) | HMW · Problem framing · One sketch · AC (3–5 bullets) | + Storyboard · Journey map · Brief · Microinteraction specs · Design-system extension · Journey meeting | + Concept test · Affinity / action / cognitive analysis · Measurement plan · Evidence-informed AC | + 5 whys · SWOT · Spectrum mapping · Pitch / RFC · Decision log · Multi-level AC · Stakeholder journey meetings |
@@ -311,16 +316,16 @@ This is the operational core. Given a card's archetype, each phase agent knows *
 ### 6.1 Reading rules
 
 1. **An agent in phase P facing archetype A runs cell (P, A).** Not lighter. Not heavier.
-2. **Bigger archetypes include smaller archetypes' methods.** A Willie Explore includes Nemo's heuristic scan and Salmon's interviews, plus its own additions. The cell reads cumulatively.
+2. **Bigger archetypes include smaller archetypes' methods.** A Willy Explore includes Nemo's heuristic scan and Salmon's interviews, plus its own additions. The cell reads cumulatively.
 3. **Phases are never skipped.** A Nemo's "competitor scan + micro-brief + heuristic scan" *is* Explore — not "skip Explore."
 4. **If the sigil changes mid-card, re-evaluate the current phase against the new cell.** A Nemo that becomes a Salmon needs interviews; add them before continuing.
 5. **Teams may add methods to a cell, but the canonical cell holds until the team writes its own `flow.yaml` override.** Removing a method from a cell is harder — requires a team-level decision.
 
 ### 6.2 The matrix is prescriptive, not aspirational
 
-Without this matrix, "intensity" is adjectival — *"do a heavy Explore for a Willie"* can mean anything from three interviews to thirty. With the matrix, a Willie Explore is *specifically* {interviews, contextual inquiry, JTBD, premortem, scenario planning, pitch outline}. Agents refuse to call something "done" until the cell's methods are accounted for (run or explicitly deferred with reason).
+Without this matrix, "intensity" is adjectival — *"do a heavy Explore for a Willy"* can mean anything from three interviews to thirty. With the matrix, a Willy Explore is *specifically* {interviews, contextual inquiry, JTBD, premortem, scenario planning, pitch outline}. Agents refuse to call something "done" until the cell's methods are accounted for (run or explicitly deferred with reason).
 
-**[AI-era]** The matrix is what the Layer-1 operator agents (Explorer / Solidifier / Builder / Shipper) mechanically enforce. When a user on a Nemo asks the Explorer to "run interviews," the agent names the cell: *"Interviews are in the Salmon and Willie cells. Nemos run competitor scan, micro-brief, heuristic eval. Want to re-sigil to Salmon, or stay Nemo?"* — see §12.
+**[AI-era]** The matrix is what the Layer-1 operator agents (Explorer / Solidifier / Builder / Shipper) mechanically enforce. When a user on a Nemo asks the Explorer to "run interviews," the agent names the cell: *"Interviews are in the Salmon and Willy cells. Nemos run competitor scan, micro-brief, heuristic eval. Want to re-sigil to Salmon, or stay Nemo?"* — see §12.
 
 ---
 
@@ -332,18 +337,18 @@ Each cell from §6 expands into a **stream**: the ordered, step-by-step checklis
 
 ### 7.1 Explore streams
 
-#### Nemo Explore (smaller × known) — budget 10–30 min
+#### Nemo Explore (known × smaller) — budget 10–30 min
 
-1. Name the sigil out loud. Confirm `smaller × known → Nemo`.
+1. Name the sigil out loud. Confirm `known × smaller → Nemo`.
 2. Heuristic scan — pick 2–3 Nielsen heuristics most likely to be violated.
 3. One HMW reframe — rewrite the problem as a single "how might we…" question.
 4. Skim a competitor pattern — one parallel, note same/different.
 5. Hick's Law check if the card touches choice-density.
 6. Close — list 1–3 concrete remaining unknowns (if any). Emit handoff to Solidifier.
 
-#### Tuna Explore (bigger × known) — budget half-day to full day
+#### Tuna Explore (known × bigger) — budget half-day to full day
 
-1. Confirm sigil (`bigger × known → Tuna`).
+1. Confirm sigil (`known × bigger → Tuna`).
 2. Convention inventory — design-system components, patterns, prior art.
 3. Journey map at mid-fidelity — one swim-lane per persona touching the flow.
 4. OSD (operational sequence diagram) if the flow crosses systems or roles.
@@ -351,7 +356,7 @@ Each cell from §6 expands into a **stream**: the ordered, step-by-step checklis
 6. Shortlist 2–3 structural directions for Solidify.
 7. Close — handoff. `locked` = framing + applicable patterns; `open` = which direction to converge on.
 
-#### Salmon Explore (smaller × unknown) — budget multi-day
+#### Salmon Explore (unknown × smaller) — budget multi-day
 
 1. Confirm sigil. Most of the card's effort lives here.
 2. User interviews — 5–8 semi-structured sessions, recorded if consent.
@@ -362,9 +367,9 @@ Each cell from §6 expands into a **stream**: the ordered, step-by-step checklis
 7. Synthesize 3–5 framings; pick the 1 with the most interview support for Solidify.
 8. Close — handoff. `locked` = chosen framing + evidence; `open` = unresolved interview tensions worth flagging.
 
-#### Willie Explore (bigger × unknown) — budget 2+ weeks
+#### Willy Explore (unknown × bigger) — budget 2+ weeks
 
-1. Confirm sigil. Prepare to re-confirm mid-phase — Willies often split.
+1. Confirm sigil. Prepare to re-confirm mid-phase — Willys often split.
 2. Market / competitive scan — deeper than Tuna; map positioning axes.
 3. User interviews — 8–15 sessions across personas.
 4. TZUMI across multiple cohorts.
@@ -409,16 +414,16 @@ Each cell from §6 expands into a **stream**: the ordered, step-by-step checklis
 6. Plan measurement — what behavioral signal will tell us this worked in Ship?
 7. Close — handoff. `locked` = brief + validated shape + AC + measurement plan.
 
-#### Willie Solidify — budget 1–3 weeks
+#### Willy Solidify — budget 1–3 weeks
 
-1. Write a pitch / RFC — the full shape. Replaces the brief for Willies.
+1. Write a pitch / RFC — the full shape. Replaces the brief for Willys.
 2. Run 2–3 concept tests across concept directions from Explore.
 3. Map tradeoffs on spectrum axes (flexibility ↔ usability, cost ↔ speed).
 4. Define personas using Goal-Directed Design if not already done in Explore.
 5. Multi-level AC — functional, UX, performance, compliance, business.
 6. Stakeholder alignment — journey-meeting format, not slide-deck review.
 7. Decision log — every major Solidify decision with reasoning and alternatives.
-8. Measurement plan — baseline, target, instrumentation. Willies without a measurement plan are vanity projects.
+8. Measurement plan — baseline, target, instrumentation. Willys without a measurement plan are vanity projects.
 9. Close — handoff. `locked` = pitch + AC + decision log + measurement plan; `open` = explicit Build latitude.
 
 ### 7.3 Build streams
@@ -450,9 +455,9 @@ Each cell from §6 expands into a **stream**: the ordered, step-by-step checklis
 4. Iterate once more if usability reveals friction.
 5. Close — handoff. `locked` = built + instrumented artifact; `open` = any test-observed friction deferred.
 
-#### Willie Build — budget month+, staged
+#### Willy Build — budget month+, staged
 
-1. Break into Tuna-sized sub-cards — each its own sigil, each its own mini-lifecycle. The parent Willie tracks progress across sub-cards.
+1. Break into Tuna-sized sub-cards — each its own sigil, each its own mini-lifecycle. The parent Willy tracks progress across sub-cards.
 2. Start with a thin vertical slice — smallest demo-able path through the full system.
 3. Integrated requirements — devs involved from spec, not thrown over the wall.
 4. Joint product reviews — designer + dev + PM co-review at each slice.
@@ -490,14 +495,14 @@ Each cell from §6 expands into a **stream**: the ordered, step-by-step checklis
 6. Iteration loop decision — queue a next loop, or close? Most Salmons queue one.
 7. Close — handoff to next Explore.
 
-#### Willie Ship — budget multi-week; partial per stage
+#### Willy Ship — budget multi-week; partial per stage
 
 1. Staged rollout — internal → alpha → beta → GA. Each stage has its own mini-Ship.
 2. Per-stage measurement — compare against Solidify's plan.
 3. Narrate per stage — short release note per stage.
-4. Retrospective after GA — what happened? What runs differently next Willie?
+4. Retrospective after GA — what happened? What runs differently next Willy?
 5. Trust receipt per stage; master trust receipt at GA.
-6. Hand to next-loop Explore. Willies almost always loop.
+6. Hand to next-loop Explore. Willys almost always loop.
 7. Close — handoff to Explore.
 
 ---
@@ -516,7 +521,7 @@ Phases are abbreviated: **E** = Explore · **S** = Solidify · **B** = Build · 
 
 ### 8.1 Generative research (interviews & conversation)
 
-- **User interviews** — 1:1 semi-structured conversations. *E.* Salmon / Willie standard; optional Tuna; skip Nemo.
+- **User interviews** — 1:1 semi-structured conversations. *E.* Salmon / Willy standard; optional Tuna; skip Nemo.
 - **JTBD interviews** (Christensen / Klement) — probe the "job" a user "hires" the product for. *E, S.*
 - **The Mom Test interviews** (Rob Fitzpatrick) — ask about behaviors and past events, not opinions or futures. *E.*
 - **Continuous discovery interviews** (Teresa Torres) — weekly customer contact woven into ongoing design work. *E, ongoing.*
@@ -685,7 +690,7 @@ Phases are abbreviated: **E** = Explore · **S** = Solidify · **B** = Build · 
 
 - **Brief (not PRD)** — one-page journey-structured doc: Problem / Journey / Shape / AC / Deferred. *S.*
 - **Micro-brief (בריפים קצרים)** — one-paragraph brief for Nemos and Tunas. *S.*
-- **Pitch / RFC** — longer Willie shape doc with tradeoffs, alternatives, decision log. *S.*
+- **Pitch / RFC** — longer Willy shape doc with tradeoffs, alternatives, decision log. *S.*
 - **Decision log** — every major decision with reasoning and alternatives. *S.*
 - **ADR — Architecture Decision Record** — tight document per technical decision. *S, B.*
 - **Journey meetings (פגישות מסע)** — decision forums organized around a user journey. *S, R.*
@@ -726,9 +731,9 @@ from: explorer
 to: solidifier
 card_id: onboarding-redesign-2026-04
 sigil:
-  size: bigger
   certainty: unknown
-archetype: willie
+  size: bigger
+archetype: willy
 phase_exited: explore
 locked:
   - "Problem framing: users abandon at step 3 because password strength surfaces late"
@@ -742,7 +747,7 @@ artifacts:
   - "decisions/in-scope-vs-out-of-scope.md"
 confidence_to_advance: 0.7
 notes: |
-  Ran Willie-intensity Explore (5 interviews + competitor scan + premortem).
+  Ran Willy-intensity Explore (5 interviews + competitor scan + premortem).
   Two open items above are blocking Solidify; everything else deferred.
   Recommended Solidify approach: one-page brief + two concept validations.
 </FLOW-handoff>
@@ -755,9 +760,9 @@ notes: |
 | `from` | yes | The exiting phase's agent name (lowercase: explorer / solidifier / builder / shipper). |
 | `to` | yes | The entering phase's agent name. For a loop start, `to: explorer` is valid. |
 | `card_id` | yes | Stable identifier for the unit of work. Source of truth across sessions. |
-| `sigil.size` | yes | `bigger` or `smaller`. |
-| `sigil.certainty` | yes | `known` or `unknown`. |
-| `archetype` | yes | `nemo` / `tuna` / `salmon` / `willie`. Derived from sigil; present explicitly so agents don't re-derive. |
+| `sigil.certainty` | yes | `known` or `unknown`. (Decided first — see §3.1.) |
+| `sigil.size` | yes | `smaller` or `bigger`. |
+| `archetype` | yes | `nemo` / `tuna` / `salmon` / `willy`. Derived from sigil; present explicitly so agents don't re-derive. |
 | `phase_exited` | yes | Which phase is ending. Must match `from`. |
 | `locked` | yes (can be empty) | Decisions the next agent must treat as settled. One bullet per decision, imperative / declarative. |
 | `open` | yes (can be empty) | Questions the next agent must resolve (or explicitly defer). |
@@ -805,7 +810,7 @@ These are designed so a solo OSS-launch handoff is forward-compatible — the V1
 | **Question** | Ask the human; keep working while you wait. | No | Explorer: *"Should I include admin users in this research, or scope to end-users only?"* |
 | **Review** | Hand to the human for explicit approval before continuing. | Soft — work pauses. | Solidifier: *"Brief is drafted — need sign-off before I hand to the Builder."* |
 | **Handoff** | Emit `<FLOW-handoff>` to the next-phase agent. | No — normal transition. | Builder → Shipper at Build exit. |
-| **Block** | Halt. Cannot proceed without the human resolving this. | Yes — hard stop. | Explorer: *"Scope changed from Salmon to Willie mid-phase. Blocking until you confirm the new sigil."* |
+| **Block** | Halt. Cannot proceed without the human resolving this. | Yes — hard stop. | Explorer: *"Scope changed from Salmon to Willy mid-phase. Blocking until you confirm the new sigil."* |
 
 ### 10.1 Rules
 
@@ -821,7 +826,7 @@ These are designed so a solo OSS-launch handoff is forward-compatible — the V1
 
 ### 11.1 Reverse transitions (handbacks)
 
-Reverse motion is **legitimate and expected** — especially for Salmons and Willies.
+Reverse motion is **legitimate and expected** — especially for Salmons and Willys.
 
 A Builder who discovers the shape is wrong hands back to Solidify. A Solidifier who discovers the problem is wrong hands back to Explore. Reverse transitions use the same `<FLOW-handoff>` format:
 
@@ -855,7 +860,7 @@ Legitimate, and Explore is the most common place they happen. Rules:
 - **Current phase re-evaluates** against the new archetype's cell in the matrix. A card that was Nemo but is now Salmon needs heavier Explore — the agent extends Explore rather than advancing.
 - **`handoff_log`** on the card preserves the old sigil for audit.
 
-Example: starting as Nemo (small × known), Explore interviews reveal the team has no idea how users actually reach step 3. Sigil becomes Salmon (small × unknown). Explore continues, now with interview-driven intensity.
+Example: starting as Nemo (known × small), Explore interviews reveal the team has no idea how users actually reach step 3. Sigil becomes Salmon (unknown × small). Explore continues, now with interview-driven intensity.
 
 ### 11.3 Skips
 
@@ -885,7 +890,7 @@ A great design-thinking mentor doesn't say *"I refuse to sketch yet"* when you a
 **That's the posture.** Operator agents:
 
 - **Surface what you're about to skip.** The matrix cell names the methods that usually land this kind of card. The agent shows you the gap before you step over it.
-- **Offer the right-sized version of the missing work.** Not the full Willie stream — the *cell-appropriate* version for this fish. A Nemo Explore "close" is 5 minutes; a Willie Explore "close" is an afternoon.
+- **Offer the right-sized version of the missing work.** Not the full Willy stream — the *cell-appropriate* version for this fish. A Nemo Explore "close" is 5 minutes; a Willy Explore "close" is an afternoon.
 - **Let you decide.** You can always say *"skip it, I'm going."* You'll do so *knowing* what you're skipping — which is the whole point.
 - **Keep finding opportunities across the session.** The nudge is persistent but kind — if you skip a research moment now, the agent will surface it again at the next natural opening, in a differently-sized form.
 
@@ -977,7 +982,7 @@ Each of the four archetypes runs end-to-end below. These are the calibration exa
 
 **Context:** Support flagged that users misinterpret the tooltip on the "Export as CSV" button. Two tickets this week asked "does this export *current view* or *all data*?"
 
-**Sigil + archetype:** `size: smaller` · `certainty: known` · **Nemo**. Budget target: under 2 hours.
+**Sigil + archetype:** `certainty: known` · `size: smaller` · **Nemo**. Budget target: under 2 hours.
 
 **Explore (10 min):** Confirmed sigil. Heuristic scan flagged "match between system and real world" violation. One HMW: *"How might we make the export-scope choice obvious before the user clicks?"* Competitor scan of 3 tools — two use dropdown, one confirmation modal. No Hick's Law concern. Handoff emitted (`confidence 0.9`).
 
@@ -993,7 +998,7 @@ Each of the four archetypes runs end-to-end below. These are the calibration exa
 
 **Context:** Customers have asked for a better billing history view. Current view shows invoices as a flat list; customers want grouped by period and downloadable.
 
-**Sigil + archetype:** `size: bigger` · `certainty: known` · **Tuna**. Budget: 2-week sprint.
+**Sigil + archetype:** `certainty: known` · `size: bigger` · **Tuna**. Budget: 2-week sprint.
 
 **Explore (1 day):** Convention inventory (invoice detail, date-range picker, download button primitives). Journey map of current flow in 5 swim-lanes. OSD for download path. Competitor scan of Stripe, Linear, Notion billing. Shortlisted 3 directions: period-grouped list / detail-drawer / hybrid. Handoff (`confidence 0.8`).
 
@@ -1009,9 +1014,9 @@ Each of the four archetypes runs end-to-end below. These are the calibration exa
 
 **Context:** Analytics flagged 40% drop at step 3 of signup. No deep user interviews since the flow was built 18 months ago.
 
-**Sigil + archetype:** `size: smaller` · `certainty: unknown` · **Salmon**. Budget: 1.5 weeks.
+**Sigil + archetype:** `certainty: unknown` · `size: smaller` · **Salmon**. Budget: 1.5 weeks.
 
-**Explore (5 days):** Sigil confirmed (warned it might flip to Willie). 7 user interviews, semi-structured, recorded with consent. TZUMI: Go-Learn → One-User → Hand-in-Hand. Nugget board with 28 atomic findings. Task analysis of step 3. Journey map anchored in interview quotes. Synthesized 3 framings; winner: *"Users abandon step 3 because the password-strength meter surfaces after typing, making them feel retroactively judged."* Handoff (`confidence 0.8`).
+**Explore (5 days):** Sigil confirmed (warned it might flip to Willy). 7 user interviews, semi-structured, recorded with consent. TZUMI: Go-Learn → One-User → Hand-in-Hand. Nugget board with 28 atomic findings. Task analysis of step 3. Journey map anchored in interview quotes. Synthesized 3 framings; winner: *"Users abandon step 3 because the password-strength meter surfaces after typing, making them feel retroactively judged."* Handoff (`confidence 0.8`).
 
 **Solidify (3 days):** Picked instructional copy pattern (strongest interview support). 1-page brief, journey-structured. Concept test with 5 users on low-fi prototype — 4/5 completed, 1/5 surfaced minor copy ambiguity. Iterated copy once. AC evidence-informed, 6 bullets. Measurement plan: track step-3 completion; target +20 pp within 30 days. Handoff.
 
@@ -1021,11 +1026,11 @@ Each of the four archetypes runs end-to-end below. These are the calibration exa
 
 **What FLOW did:** Kept Explore heavy where it belonged. Without the 7-interview discipline, the team would have shipped a cosmetic copy fix and missed the real cause (meter placement). Measurement plan in Solidify, not Ship, so Ship could actually measure. Next-loop handoff meant the follow-up question went back to Explore with a fresh sigil, not to `/dev/null`.
 
-### 14.4 Willie — multiplayer handoff (V1)
+### 14.4 Willy — multiplayer handoff (V1)
 
 **Context:** Duble Slash's own V1 roadmap. The killer demo is Sarah (designer, Claude) handing off to Marcus (developer, VS Code) via Duble Slash Cloud. Nothing like this exists in our product yet.
 
-**Sigil + archetype:** `size: bigger` · `certainty: unknown` · **Willie**. Budget: 4 months.
+**Sigil + archetype:** `certainty: unknown` · `size: bigger` · **Willy**. Budget: 4 months.
 
 **Explore (3 weeks):** Sigil confirmed, warned about sub-splits. Market scan of Granola, Rewind, Linear+AI, Cursor Teams. 12 interviews across 3 personas (Senior IC, Team Lead, New Joiner). TZUMI across two cohorts. Contextual inquiry with two teams (4 hours each, Shenhav pairing). Goal-Directed Design personas. JTBD pass. OSD for Sarah → Marcus across 5 tool boundaries. Premortem surfaced 3 failure modes (trust leak, presence-notification fatigue, no canonical card id). Scenario planning: happy path + "Marcus offline" + "Sarah's handoff has a secret" + "three teammates on same card." Pitch outline drafted. Handoff (`confidence 0.75`).
 
@@ -1038,11 +1043,11 @@ Each of the four archetypes runs end-to-end below. These are the calibration exa
 - *Alpha (weeks 2–3):* 5 teams. Time-to-pickup ~12s (target <60s). Acceptance 72%. Trust receipt per team.
 - *Beta (weeks 3–4):* 30 teams. Handoff satisfaction 4.2/5. Two Salmons spawned for presence-fatigue.
 - *GA:* full release + announcement post.
-- *Retrospective:* surfaced that Willies with >3 sub-cards should add a sub-card health meter — logged for next Willie.
+- *Retrospective:* surfaced that Willys with >3 sub-cards should add a sub-card health meter — logged for next Willy.
 - *Master trust receipt* covers the whole V1 handoff with all child sigils, measurements, approvers.
 - *Queued 3 next-loop Explores:* presence fatigue, cross-team handoff, mobile pickup.
 
-**What FLOW did:** Willie-sized Explore protected against the "Sarah → Marcus seems simple" trap — the premortem's 3 failure modes became design inputs, not launch bugs. Break-into-Tunas kept the Willie build-able. Staged Ship meant measurement didn't wait for GA. Decision log became the onboarding doc for the next Willie — institutional memory instead of archaeology.
+**What FLOW did:** Willy-sized Explore protected against the "Sarah → Marcus seems simple" trap — the premortem's 3 failure modes became design inputs, not launch bugs. Break-into-Tunas kept the Willy build-able. Staged Ship meant measurement didn't wait for GA. Decision log became the onboarding doc for the next Willy — institutional memory instead of archaeology.
 
 ---
 
@@ -1058,7 +1063,7 @@ Each of the four archetypes runs end-to-end below. These are the calibration exa
 
 - **Agile sprints** → replaced by continuous ship-ability per fish-shape. No two-week rhythm forced on work that doesn't fit it.
 - **PRDs** → replaced by phase-shaped briefs (Explore findings, Solidify brief, Build AC, Ship trust receipt).
-- **Standups** → replaced by project-level digests via Duble Slash Cloud (V1.5+): *"Today across your team: 3 Salmons in Explore, 2 Tunas in Build, 1 Willie entering Solidify."*
+- **Standups** → replaced by project-level digests via Duble Slash Cloud (V1.5+): *"Today across your team: 3 Salmons in Explore, 2 Tunas in Build, 1 Willy entering Solidify."*
 - **Vague "process" in AI tools** → replaced by phase-shaped, nudging agents that know the matrix and surface missing cell-methods.
 - **Figma-link + Slack-paragraph handoffs** → replaced by card + handoff briefs that survive sessions and tools.
 
@@ -1077,7 +1082,7 @@ FLOW stands on three legs:
 
 - **Béla H. Bánáthy's divergence–convergence model** (systems thinking, 1960s–70s) — the "diamond shape" inside every phase.
 - **UK Design Council's Double Diamond** (2004, revised 2019) — the two-diamond split between problem and solution space; the direct parent of the left-body / right-body split.
-- **The Fish Model** (Tal Solomon, 2024, [talsolomonux.com/p/0d2](https://www.talsolomonux.com/p/0d2) + follow-up articles) — the species as archetypes; the scope × familiarity axes; sprint capacity per fish; PD leader per fish; curated method selection per cell; brief-not-PRD; journey meetings.
+- **The Fish Model** (Tal Solomon, 2024, [talsolomonux.com/p/0d2](https://www.talsolomonux.com/p/0d2) + follow-up articles) — the species as archetypes; the familiarity × scope axes; sprint capacity per fish; PD leader per fish; curated method selection per cell; brief-not-PRD; journey meetings.
 
 **FLOW (this spec, 2026)** is the AI-operable evolution: same lineage, newly legible to LLMs and to a multiplayer graph. Specifically, FLOW adds:
 

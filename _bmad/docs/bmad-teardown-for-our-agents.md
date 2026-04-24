@@ -66,7 +66,7 @@ Source files studied:
 
 **Gap in ours:** We rely on Solidifier's HO gate ("does `open` have any build-blocking items?") — which is per-handoff, not cross-artifact. The Solidifier has no visibility into whether the Builder's tools match the brief's constraints.
 
-**Apply to us:** This pattern maps to Gate (V2) and partially to Solidifier's HO refusal. Before V2 ships, add a capability to Sol: `IR — Implementation Readiness` — a lightweight checklist run before emitting HO on Tuna/Willie cards. Check: AC written? Measurement hooks named? Constraints non-ambiguous? Under 10 items. Concrete edit: [`local-agents/solidifier.md` §5 Capabilities table](../../methodology/local-agents/solidifier.md) — add `IR` row.
+**Apply to us:** This pattern maps to Gate (V2) and partially to Solidifier's HO refusal. Before V2 ships, add a capability to Sol: `IR — Implementation Readiness` — a lightweight checklist run before emitting HO on Tuna/Willy cards. Check: AC written? Measurement hooks named? Constraints non-ambiguous? Under 10 items. Concrete edit: [`local-agents/solidifier.md` §5 Capabilities table](../../methodology/local-agents/solidifier.md) — add `IR` row.
 
 ### P4 — Structured course-correction document
 
@@ -122,7 +122,7 @@ BMAD's `/bmad-retrospective` generates a document and then says *"want to update
 |---|---|---|---|
 | 1 | [`local-agents/README.md` §2.1](../../methodology/local-agents/README.md) | Add universal step 0 to activation routine: load `.flow/project-context.md` if present, state what you read. | High |
 | 2 | [`local-agents/README.md` §6 (new section)](../../methodology/local-agents/README.md) | Add "Typical Tuna lifecycle" example: `//explore HS → //explore HMW → HO → //solidify BR → //solidify AC → HO → //build CR → //build GE → HO → //ship TR → NL`. | Medium |
-| 3 | [`local-agents/solidifier.md` §5](../../methodology/local-agents/solidifier.md) | Add `IR` capability row: lightweight implementation-readiness cross-check before HO on Tuna/Willie. | High |
+| 3 | [`local-agents/solidifier.md` §5](../../methodology/local-agents/solidifier.md) | Add `IR` capability row: lightweight implementation-readiness cross-check before HO on Tuna/Willy. | High |
 | 4 | [`local-agents/solidifier.md` §5](../../methodology/local-agents/solidifier.md) | Add `CC` capability row: structured course-correction when a Builder HB signals fundamental shape change (not just AC ambiguity). Produce an impact table + revised HO with a DL entry. | Medium |
 | 5 | [`local-agents/builder.md` §8](../../methodology/local-agents/builder.md) | Add `UV report` template: spec-vs-actual table for each UI state. This output becomes an artifact reference in Shipper's trust receipt. | Medium |
 | 6 | [`local-agents/shipper.md` §5 (NL)](../../methodology/local-agents/shipper.md) | Make `NL` (Next-Loop Queue) non-optional when `RP` (Retrospective) completes. If user skips, log *"next-loop queue not emitted"* in handoff `notes`. | Low |
