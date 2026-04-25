@@ -90,6 +90,43 @@ model_policy:
                                      # judgment. Structural wireframe description can drop to Haiku.
     ad: sonnet                       # ADR: consequences ('becomes harder' side) require judgment.
                                      # Haiku ADRs have generic consequences like 'increases complexity'.
+    # Bran sub-methods (Build phase)
+    cr: haiku                        # Contract Readout: restatement + ambiguity flagging. Templated surface
+                                     # with judgment on "is this AC actually concrete?". Sonnet for dense
+                                     # contracts with subtle ambiguity.
+    sl: sonnet                       # Slice Plan: sequencing + judgment about what unblocks what. Haiku
+                                     # tends to slice along file boundaries instead of user-visible capabilities.
+    ge: sonnet                       # Generate Code: pattern choice, naming, smallest-change discipline.
+                                     # Drop to Haiku only for purely mechanical edits (typos, single-line config).
+    te: sonnet                       # Tests: edge-case judgment, fixture design, assertion sharpness.
+                                     # Haiku for simple unit tests where AC names exact inputs/outputs.
+    uv: sonnet                       # UI Verify: observation + judgment on what's worth flagging vs noise.
+                                     # Haiku fine for static pages or pure copy changes.
+    in: sonnet                       # Instrumentation: trigger-point selection + property correctness +
+                                     # honest smoke-test. Haiku for purely additive cases with one obvious entry.
+    pr: haiku                        # PR Draft: templated narrative (bullets, AC table, test-plan checklist).
+                                     # Escalate to Sonnet when summary needs engineering→customer translation.
+    # May sub-methods (Ship phase)
+    re: haiku                        # Release Readout: structured checklist + judgment about red flags.
+                                     # Sonnet for handoffs with subtle deltas or interpretively-loaded test status.
+    cm: haiku                        # Commit Message: templated narrative; the why is the judgment surface.
+                                     # Sonnet when the why involves audience translation or regulatory framing.
+    ch: haiku                        # Changelog: templated entries + audience translation. Escalate to Sonnet
+                                     # when customer-facing copy must reframe engineering moves as outcomes.
+    rn: sonnet                       # Release Notes: narrative writing for a public audience. Always Sonnet.
+                                     # Haiku release notes come back as feature lists with section headers.
+    tg: haiku                        # Tag/Version: templated emission + one judgment call (semver level).
+                                     # Sonnet when change scope is genuinely ambiguous (cross-cutting refactor).
+    ms: haiku                        # Measurement Setup: query + snapshot + write. Templated capture.
+                                     # Sonnet when metric is composite (funnel across multi-events).
+    mr: sonnet                       # Measurement Readout: honest reading + interpretive judgment about
+                                     # which surprise matters. Haiku MRs come back as feature-perf summaries.
+    rp: sonnet                       # Retrospective: interpretive synthesis across a long timeline + willingness
+                                     # to name generative friction. Haiku retros = bulleted celebration.
+    tr: haiku                        # Trust Receipt: templated emission + hash compute. Pure mechanical work;
+                                     # no reason to escalate.
+    nl: sonnet                       # Next-Loop Queue: judgment-weighted assembly — picking which learnings
+                                     # + surprises matter for next loop. Haiku NLs = MR/RP copy-paste.
     # Helpers
     ho: haiku                        # Handoff compose: schema-validated block emission.
     hb: haiku                        # Handback compose: schema-validated reverse emission.
