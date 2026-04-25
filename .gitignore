@@ -14,3 +14,6 @@ supabase/bootstrap-users.sql
 
 # Microsoft Office lock files (open doc → ~$filename.docx/pptx).
 ~$*
+
+# Bundles staged for export to other repos (move them out, don't commit here).
+_export/
