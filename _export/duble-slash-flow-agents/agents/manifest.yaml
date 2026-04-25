@@ -1,0 +1,33 @@
+---
+name: duble-slash-agents
+description: Two-layer FLOW agent system — operators (Dora/Sol/Bran/May) + experts (Design/PM/Dev/...) + helpers.
+version: 0.1.0
+method: FLOW
+method_spec: methodology/flow.md
+date: 2026-04-24
+---
+
+modules:
+  operators:
+    path: agents/operators
+    type: layer-1
+    description: Phase-bound operators. One per FLOW phase (head, left body, right body, tail).
+  experts:
+    path: agents/experts
+    type: layer-2
+    description: Domain-bound experts. Loaned in from operator turns via @handle, or invoked directly.
+  helpers:
+    path: agents/helpers
+    type: cross-cutting
+    description: Shared utilities invoked from operator or expert workflow steps.
+
+config_layering:
+  order:
+    - agents/config.yaml                # project-wide
+    - .flow/flow.yaml                   # team overrides (optional)
+    - project-context.md                # per-repo context (optional)
+  conflict_resolution: later-layers-win-for-non-conflicting-keys
+
+manifests:
+  agents: agents/agent-manifest.csv
+  skills: agents/skill-manifest.csv

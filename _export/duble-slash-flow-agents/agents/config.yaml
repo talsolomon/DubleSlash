@@ -1,0 +1,135 @@
+# Duble Slash agents — project-wide config
+# Read on activation by every operator and expert SKILL.md.
+
+project_name: Duble Slash
+method: FLOW
+
+# User-facing settings (overridable per-install in `.flow/flow.yaml`)
+user_name: Tal
+user_skill_level: expert
+user_role: product-design-executive
+
+# Language
+communication_language: English
+document_output_language: English
+
+# Paths (relative to project-root)
+planning_artifacts: "{project-root}/planning"
+implementation_artifacts: "{project-root}/planning/stories"
+project_knowledge: "{project-root}/planning/research"
+methodology: "{project-root}/methodology"
+flow_spec: "{project-root}/methodology/flow.md"
+
+# Output folders (created on demand)
+output_folder: planning
+handoff_folder: "{project-root}/.flow/handoffs"
+card_folder: "{project-root}/.flow/cards"
+
+# Agent system
+operator_layer: "{project-root}/agents/operators"
+expert_layer: "{project-root}/agents/experts"
+helpers: "{project-root}/agents/helpers"
+
+# Model policy — applies to every subagent, helper, sub-skill, and /loop or scheduled
+# trigger spawned from this project. Top-level session model is set at launch and is
+# out of scope here.
+#
+# Principle: pick the model that matches the moment. Match the model's strength
+# to the shape of the work — cheap + fast for tagging, extraction, schema emits;
+# judgment-strong for generative reframing, adversarial reasoning, interpretive
+# synthesis. The right model is the one that does *this specific job* well,
+# not the most expensive you can afford.
+model_policy:
+  default: haiku                     # extraction, tagging, schema-validated emits, structured
+                                     # composition, single-hop lookups. Fast, cheap, accurate
+                                     # at the shape of work most Dora sub-methods produce.
+  escalate_to: sonnet                # generative reframing, multi-step synthesis, adversarial
+                                     # reasoning, interpretive judgment. Worth the spend when
+                                     # the task's value depends on the quality of the thinking.
+  forbidden: [opus]                  # off the menu — not in our cost/value band for any method
+                                     # currently on the roster.
+
+  # Per-capability hints — why *this* model for *this* method.
+  hints:
+    # Dora sub-methods
+    sa: haiku                        # Sigil Assist: rule-based classification over a 2×2 matrix.
+    hs: sonnet                       # Heuristic Scan: 4-pass expert read — judgment across
+                                     # conventions, risks, gaps, recommendation.
+    hmw: sonnet                      # How-Might-We: generative reframing across 5 lenses.
+                                     # Haiku HMWs come back shallow and repetitive.
+    jm: haiku                        # Journey Map: structured extraction into stage × dimension
+                                     # table. Sonnet for Willy-scale multi-persona ethnography.
+    cs: haiku                        # Competitor scan: pattern aggregation across parallels.
+                                     # Sonnet when the output is a positioning-axis map.
+    ip: haiku                        # Interview Plan: templated generation (cohort, RQs, guide).
+    nb: haiku                        # Nugget Board: atomic-unit tagging + clustering at scale.
+                                     # Sonnet when contradictions need interpretive work.
+    pm: sonnet                       # Premortem: adversarial reasoning with probability × severity.
+                                     # Haiku produces generic failure modes, not specific ones.
+    sr: haiku                        # Stream Recap: summarization under a tight word budget.
+    # Sol sub-methods
+    sk: sonnet                       # Sketch: pick ONE shape over alternatives — judgment, not
+                                     # enumeration. Haiku picks the first-mentioned option.
+    br: sonnet                       # Brief: templated structure is Haiku-shaped, but shape choice,
+                                     # AC sharpness, and out-of-scope honesty reward judgment.
+    sb: sonnet                       # Storyboard: panel generation + caption tightness + branch
+                                     # identification is narrative. Haiku returns screen-grabs.
+    pt: sonnet                       # Pitch/RFC: long-form, interpretive, adversarial. Sonnet always.
+                                     # Haiku pitches come back as feature lists under headers.
+    ct: haiku                        # Concept Test: templated plan (cohort, prototype, RQs, tasks,
+                                     # pass/fail). Escalate to Sonnet on novel prototype specs.
+    ac: sonnet                       # Acceptance Criteria: the REWRITE pass ('should be fast' →
+                                     # '≤ 500ms p95') needs domain judgment. Haiku drafts; Sonnet sharpens.
+    mp: haiku                        # Measurement Plan: templated (metric, baseline, target,
+                                     # instrumentation, stop-the-line). Substance is the user's, not model's.
+    dl: sonnet                       # Decision Log: reasoning + reversibility + revisit conditions
+                                     # reward judgment. Haiku revisits come back generic.
+    ta: sonnet                       # Tradeoff Axes: naming a REAL tension vs. strawman is creative
+                                     # judgment. Haiku TA reads as 'good ↔ bad'.
+    wf: sonnet                       # Wireframe Spec: Saffer microinteraction annotation needs
+                                     # judgment. Structural wireframe description can drop to Haiku.
+    ad: sonnet                       # ADR: consequences ('becomes harder' side) require judgment.
+                                     # Haiku ADRs have generic consequences like 'increases complexity'.
+    # Bran sub-methods (Build phase)
+    cr: haiku                        # Contract Readout: restatement + ambiguity flagging. Templated surface
+                                     # with judgment on "is this AC actually concrete?". Sonnet for dense
+                                     # contracts with subtle ambiguity.
+    sl: sonnet                       # Slice Plan: sequencing + judgment about what unblocks what. Haiku
+                                     # tends to slice along file boundaries instead of user-visible capabilities.
+    ge: sonnet                       # Generate Code: pattern choice, naming, smallest-change discipline.
+                                     # Drop to Haiku only for purely mechanical edits (typos, single-line config).
+    te: sonnet                       # Tests: edge-case judgment, fixture design, assertion sharpness.
+                                     # Haiku for simple unit tests where AC names exact inputs/outputs.
+    uv: sonnet                       # UI Verify: observation + judgment on what's worth flagging vs noise.
+                                     # Haiku fine for static pages or pure copy changes.
+    in: sonnet                       # Instrumentation: trigger-point selection + property correctness +
+                                     # honest smoke-test. Haiku for purely additive cases with one obvious entry.
+    pr: haiku                        # PR Draft: templated narrative (bullets, AC table, test-plan checklist).
+                                     # Escalate to Sonnet when summary needs engineering→customer translation.
+    # May sub-methods (Ship phase)
+    re: haiku                        # Release Readout: structured checklist + judgment about red flags.
+                                     # Sonnet for handoffs with subtle deltas or interpretively-loaded test status.
+    cm: haiku                        # Commit Message: templated narrative; the why is the judgment surface.
+                                     # Sonnet when the why involves audience translation or regulatory framing.
+    ch: haiku                        # Changelog: templated entries + audience translation. Escalate to Sonnet
+                                     # when customer-facing copy must reframe engineering moves as outcomes.
+    rn: sonnet                       # Release Notes: narrative writing for a public audience. Always Sonnet.
+                                     # Haiku release notes come back as feature lists with section headers.
+    tg: haiku                        # Tag/Version: templated emission + one judgment call (semver level).
+                                     # Sonnet when change scope is genuinely ambiguous (cross-cutting refactor).
+    ms: haiku                        # Measurement Setup: query + snapshot + write. Templated capture.
+                                     # Sonnet when metric is composite (funnel across multi-events).
+    mr: sonnet                       # Measurement Readout: honest reading + interpretive judgment about
+                                     # which surprise matters. Haiku MRs come back as feature-perf summaries.
+    rp: sonnet                       # Retrospective: interpretive synthesis across a long timeline + willingness
+                                     # to name generative friction. Haiku retros = bulleted celebration.
+    tr: haiku                        # Trust Receipt: templated emission + hash compute. Pure mechanical work;
+                                     # no reason to escalate.
+    nl: sonnet                       # Next-Loop Queue: judgment-weighted assembly — picking which learnings
+                                     # + surprises matter for next loop. Haiku NLs = MR/RP copy-paste.
+    # Helpers
+    ho: haiku                        # Handoff compose: schema-validated block emission.
+    hb: haiku                        # Handback compose: schema-validated reverse emission.
+
+  # Subagents get `model` passed explicitly on every spawn — no silent defaults.
+  enforcement: explicit
